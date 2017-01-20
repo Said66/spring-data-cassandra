@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2016 the original author or authors.
+ * Copyright 2013-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,10 +17,6 @@ package org.springframework.data.cassandra.core;
 
 import java.util.Map;
 
-import com.datastax.driver.core.KeyspaceMetadata;
-import com.datastax.driver.core.Session;
-import com.datastax.driver.core.TableMetadata;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cassandra.core.SessionCallback;
@@ -35,6 +31,10 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.data.cassandra.convert.CassandraConverter;
 import org.springframework.data.cassandra.mapping.CassandraPersistentEntity;
 import org.springframework.util.Assert;
+
+import com.datastax.driver.core.KeyspaceMetadata;
+import com.datastax.driver.core.Session;
+import com.datastax.driver.core.TableMetadata;
 
 /**
  * Default implementation of {@link CassandraAdminOperations}.
@@ -65,7 +65,7 @@ public class CassandraAdminTemplate extends CassandraTemplate implements Cassand
 	public void createTable(boolean ifNotExists, CqlIdentifier tableName, Class<?> entityClass,
 			Map<String, Object> optionsByName) {
 
-		CassandraPersistentEntity<?> entity = getPersistentEntity(entityClass);
+		CassandraPersistentEntity<?> entity = getConverter().getMappingContext().getRequiredPersistentEntity(entityClass);
 
 		CreateTableSpecification createTableSpecification = getConverter().getMappingContext()
 				.getCreateTableSpecificationFor(entity).ifNotExists(ifNotExists);

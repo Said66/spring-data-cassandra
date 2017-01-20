@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 the original author or authors.
+ * Copyright 2016-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,8 @@ package org.springframework.data.cassandra.repository.query;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.Optional;
 
 import org.reactivestreams.Publisher;
 import org.springframework.core.convert.converter.Converter;
@@ -97,7 +99,8 @@ public abstract class AbstractReactiveCassandraQuery implements RepositoryQuery 
 
 		String query = createQuery(convertingParameterAccessor);
 
-		ResultProcessor resultProcessor = method.getResultProcessor().withDynamicProjection(convertingParameterAccessor);
+		// FIXME: Use ResultProcessor#withDynamicProjection(ParameterAccessor) when available
+		ResultProcessor resultProcessor = method.getResultProcessor().withDynamicProjection(Optional.of(convertingParameterAccessor));
 
 		ReactiveCassandraQueryExecution queryExecution = getExecution(new ResultProcessingConverter(
 				resultProcessor, operations.getConverter().getMappingContext(), instantiators));

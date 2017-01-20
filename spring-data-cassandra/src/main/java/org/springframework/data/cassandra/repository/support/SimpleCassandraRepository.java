@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2016 the original author or authors
+ * Copyright 2013-2017 the original author or authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,7 @@ package org.springframework.data.cassandra.repository.support;
 
 import java.io.Serializable;
 import java.util.List;
-
-import com.datastax.driver.core.querybuilder.QueryBuilder;
-import com.datastax.driver.core.querybuilder.Select;
+import java.util.Optional;
 
 import org.springframework.cassandra.core.util.CollectionUtils;
 import org.springframework.data.cassandra.core.CassandraOperations;
@@ -27,6 +25,9 @@ import org.springframework.data.cassandra.core.CassandraTemplate;
 import org.springframework.data.cassandra.repository.TypedIdCassandraRepository;
 import org.springframework.data.cassandra.repository.query.CassandraEntityInformation;
 import org.springframework.util.Assert;
+
+import com.datastax.driver.core.querybuilder.QueryBuilder;
+import com.datastax.driver.core.querybuilder.Select;
 
 /**
  * Repository base implementation for Cassandra.
@@ -67,8 +68,8 @@ public class SimpleCassandraRepository<T, ID extends Serializable> implements Ty
 	}
 
 	@Override
-	public T findOne(ID id) {
-		return operations.selectOneById(id, entityInformation.getJavaType());
+	public Optional<T> findOne(ID id) {
+		return Optional.ofNullable(operations.selectOneById(id, entityInformation.getJavaType()));
 	}
 
 	@Override
@@ -88,7 +89,8 @@ public class SimpleCassandraRepository<T, ID extends Serializable> implements Ty
 
 	@Override
 	public void delete(T entity) {
-		delete(entityInformation.getId(entity));
+		delete(entityInformation.getId(entity)
+				.orElseThrow(() -> new IllegalArgumentException(String.format("Cannot obtain Id from [%s]", entity))));
 	}
 
 	@Override

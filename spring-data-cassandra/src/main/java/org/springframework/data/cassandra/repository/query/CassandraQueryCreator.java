@@ -19,11 +19,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Pattern;
-
-import com.datastax.driver.core.querybuilder.Clause;
-import com.datastax.driver.core.querybuilder.QueryBuilder;
-import com.datastax.driver.core.querybuilder.Select;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,6 +39,10 @@ import org.springframework.data.repository.query.parser.Part;
 import org.springframework.data.repository.query.parser.Part.Type;
 import org.springframework.data.repository.query.parser.PartTree;
 import org.springframework.util.Assert;
+
+import com.datastax.driver.core.querybuilder.Clause;
+import com.datastax.driver.core.querybuilder.QueryBuilder;
+import com.datastax.driver.core.querybuilder.Select;
 
 /**
  * Custom query creator to create Cassandra criteria.
@@ -78,7 +79,7 @@ class CassandraQueryCreator extends AbstractQueryCreator<Select, Clause> {
 		Assert.notNull(entityMetadata, "CassandraEntityMetadata must not be null");
 
 		this.mappingContext = mappingContext;
-		this.entity = mappingContext.getPersistentEntity(entityMetadata.getJavaType());
+		this.entity = mappingContext.getRequiredPersistentEntity(entityMetadata.getJavaType());
 		this.tableName = entityMetadata.getTableName();
 	}
 
@@ -88,8 +89,8 @@ class CassandraQueryCreator extends AbstractQueryCreator<Select, Clause> {
 	@Override
 	protected Clause create(Part part, Iterator<Object> iterator) {
 
-		PersistentPropertyPath<CassandraPersistentProperty> path =
-			mappingContext.getPersistentPropertyPath(part.getProperty());
+		PersistentPropertyPath<CassandraPersistentProperty> path = mappingContext
+				.getPersistentPropertyPath(part.getProperty());
 
 		CassandraPersistentProperty property = path.getLeafProperty();
 
@@ -171,8 +172,8 @@ class CassandraQueryCreator extends AbstractQueryCreator<Select, Clause> {
 			case SIMPLE_PROPERTY:
 				return QueryBuilder.eq(columnName(property), parameters.nextConverted(property));
 			default:
-				throw new InvalidDataAccessApiUsageException(String.format(
-					"Unsupported keyword [%s] in part [%s]", type, part));
+				throw new InvalidDataAccessApiUsageException(
+						String.format("Unsupported keyword [%s] in part [%s]", type, part));
 		}
 	}
 
@@ -254,7 +255,8 @@ class CassandraQueryCreator extends AbstractQueryCreator<Select, Clause> {
 		 * Build a {@link Select} statement from the given {@link WhereBuilder} and {@link Sort}. Resolves property names
 		 * for {@link Sort} using the {@link CassandraPersistentEntity}.
 		 */
-		static Select select(CassandraPersistentEntity<?> entity, CqlIdentifier tableName, WhereBuilder whereBuilder, Sort sort) {
+		static Select select(CassandraPersistentEntity<?> entity, CqlIdentifier tableName, WhereBuilder whereBuilder,
+				Sort sort) {
 
 			Select select = QueryBuilder.select().from(tableName.toCql());
 
@@ -277,28 +279,28 @@ class CassandraQueryCreator extends AbstractQueryCreator<Select, Clause> {
 			return select;
 		}
 
+		@SuppressWarnings("unchecked")
 		private static CassandraPersistentProperty getPersistentProperty(CassandraPersistentEntity<?> entity,
 				String dotPath) {
 
 			String[] segments = PUNCTUATION_PATTERN.split(dotPath);
 
-			CassandraPersistentProperty property = null;
+			Optional<CassandraPersistentProperty> property = Optional.empty();
 			CassandraPersistentEntity<?> currentEntity = entity;
 
 			for (String segment : segments) {
+
 				property = currentEntity.getPersistentProperty(segment);
+				currentEntity = property //
+						.filter(CassandraPersistentProperty::isCompositePrimaryKey) //
+						.map(CassandraPersistentProperty::getCompositePrimaryKeyEntity) //
+						.orElse((CassandraPersistentEntity) entity);
 
-				if (property != null && property.isCompositePrimaryKey()) {
-					currentEntity = property.getCompositePrimaryKeyEntity();
-				}
 			}
 
-			if (property != null) {
-				return property;
-			}
+			return property.orElseThrow(() -> new IllegalArgumentException(
+					String.format("Cannot resolve path [%s] to a property of [%s]", dotPath, entity.getName())));
 
-			throw new IllegalArgumentException(String.format(
-				"Cannot resolve path [%s] to a property of [%s]", dotPath, entity.getName()));
 		}
 	}
 }

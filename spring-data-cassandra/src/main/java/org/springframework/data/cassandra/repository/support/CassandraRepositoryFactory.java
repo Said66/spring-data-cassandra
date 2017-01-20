@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2016 the original author or authors
+ * Copyright 2013-2017 the original author or authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@ package org.springframework.data.cassandra.repository.support;
 
 import java.io.Serializable;
 import java.lang.reflect.Method;
+import java.util.Optional;
 
 import org.springframework.data.cassandra.core.CassandraOperations;
 import org.springframework.data.cassandra.mapping.CassandraMappingContext;
@@ -26,7 +27,6 @@ import org.springframework.data.cassandra.repository.query.CassandraEntityInform
 import org.springframework.data.cassandra.repository.query.CassandraQueryMethod;
 import org.springframework.data.cassandra.repository.query.PartTreeCassandraQuery;
 import org.springframework.data.cassandra.repository.query.StringBasedCassandraQuery;
-import org.springframework.data.mapping.model.MappingException;
 import org.springframework.data.projection.ProjectionFactory;
 import org.springframework.data.repository.core.NamedQueries;
 import org.springframework.data.repository.core.RepositoryInformation;
@@ -53,6 +53,7 @@ public class CassandraRepositoryFactory extends RepositoryFactorySupport {
 	private static final SpelExpressionParser EXPRESSION_PARSER = new SpelExpressionParser();
 
 	private final CassandraMappingContext mappingContext;
+
 	private final CassandraOperations operations;
 
 	/**
@@ -84,8 +85,7 @@ public class CassandraRepositoryFactory extends RepositoryFactorySupport {
 	@Override
 	protected Object getTargetRepository(RepositoryInformation information) {
 
-		CassandraEntityInformation<?, Serializable> entityInformation =
-			getEntityInformation(information.getDomainType());
+		CassandraEntityInformation<?, Serializable> entityInformation = getEntityInformation(information.getDomainType());
 
 		return getTargetRepositoryViaReflection(information, entityInformation, operations);
 	}
@@ -98,12 +98,7 @@ public class CassandraRepositoryFactory extends RepositoryFactorySupport {
 	@SuppressWarnings("unchecked")
 	public <T, ID extends Serializable> CassandraEntityInformation<T, ID> getEntityInformation(Class<T> domainClass) {
 
-		CassandraPersistentEntity<?> entity = mappingContext.getPersistentEntity(domainClass);
-
-		if (entity == null) {
-			throw new MappingException(String.format("Could not lookup mapping metadata for domain class %s",
-				domainClass.getName()));
-		}
+		CassandraPersistentEntity<?> entity = mappingContext.getRequiredPersistentEntity(domainClass);
 
 		return new MappingCassandraEntityInformation<T, ID>((CassandraPersistentEntity<T>) entity,
 				operations.getConverter());
@@ -111,30 +106,24 @@ public class CassandraRepositoryFactory extends RepositoryFactorySupport {
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.springframework.data.repository.core.support.RepositoryFactorySupport#getQueryLookupStrategy(Key)
-	 */
-	@Override
-	protected QueryLookupStrategy getQueryLookupStrategy(Key key) {
-		return getQueryLookupStrategy(key, null);
-	}
-
-	/*
-	 * (non-Javadoc)
 	 * @see org.springframework.data.repository.core.support.RepositoryFactorySupport#getQueryLookupStrategy(Key, EvaluationContextProvider)
 	 */
 	@Override
-	protected QueryLookupStrategy getQueryLookupStrategy(Key key, EvaluationContextProvider evaluationContextProvider) {
-		return new CassandraQueryLookupStrategy(operations, evaluationContextProvider, mappingContext);
+	protected Optional<QueryLookupStrategy> getQueryLookupStrategy(Key key,
+			EvaluationContextProvider evaluationContextProvider) {
+		return Optional.of(new CassandraQueryLookupStrategy(operations, evaluationContextProvider, mappingContext));
 	}
 
 	private class CassandraQueryLookupStrategy implements QueryLookupStrategy {
 
 		private final EvaluationContextProvider evaluationContextProvider;
+
 		private final CassandraMappingContext mappingContext;
+
 		private final CassandraOperations operations;
 
-		public CassandraQueryLookupStrategy(CassandraOperations operations,
-				EvaluationContextProvider evaluationContextProvider, CassandraMappingContext mappingContext) {
+		CassandraQueryLookupStrategy(CassandraOperations operations, EvaluationContextProvider evaluationContextProvider,
+				CassandraMappingContext mappingContext) {
 
 			this.operations = operations;
 			this.evaluationContextProvider = evaluationContextProvider;
@@ -157,8 +146,7 @@ public class CassandraRepositoryFactory extends RepositoryFactorySupport {
 				return new StringBasedCassandraQuery(namedQuery, queryMethod, operations, EXPRESSION_PARSER,
 						evaluationContextProvider);
 			} else if (queryMethod.hasAnnotatedQuery()) {
-				return new StringBasedCassandraQuery(queryMethod, operations, EXPRESSION_PARSER,
-						evaluationContextProvider);
+				return new StringBasedCassandraQuery(queryMethod, operations, EXPRESSION_PARSER, evaluationContextProvider);
 			} else {
 				return new PartTreeCassandraQuery(queryMethod, operations);
 			}

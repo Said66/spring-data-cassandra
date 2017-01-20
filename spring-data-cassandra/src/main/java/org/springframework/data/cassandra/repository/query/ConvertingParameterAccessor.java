@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 the original author or authors.
+ * Copyright 2016-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,8 @@
 package org.springframework.data.cassandra.repository.query;
 
 import java.util.Iterator;
+import java.util.Optional;
 import java.util.Set;
-
-import com.datastax.driver.core.CodecRegistry;
-import com.datastax.driver.core.DataType;
-import com.datastax.driver.core.DataType.CollectionType;
-import com.datastax.driver.core.TypeCodec;
 
 import org.springframework.data.cassandra.convert.CassandraConverter;
 import org.springframework.data.cassandra.mapping.CassandraMappingContext;
@@ -32,6 +28,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.util.ClassTypeInformation;
 import org.springframework.data.util.TypeInformation;
+
+import com.datastax.driver.core.CodecRegistry;
+import com.datastax.driver.core.DataType;
+import com.datastax.driver.core.DataType.CollectionType;
+import com.datastax.driver.core.TypeCodec;
 
 /**
  * Custom {@link org.springframework.data.repository.query.ParameterAccessor} that uses a {@link CassandraConverter} to
@@ -72,7 +73,7 @@ class ConvertingParameterAccessor implements CassandraParameterAccessor {
 	 * @see org.springframework.data.repository.query.ParameterAccessor#getDynamicProjection()
 	 */
 	@Override
-	public Class<?> getDynamicProjection() {
+	public Optional<Class<?>> getDynamicProjection() {
 		return delegate.getDynamicProjection();
 	}
 
@@ -137,8 +138,8 @@ class ConvertingParameterAccessor implements CassandraParameterAccessor {
 	@SuppressWarnings("unchecked")
 	private Object potentiallyConvert(int index, Object bindableValue, CassandraPersistentProperty property) {
 
-		return (bindableValue == null ? null
-				: converter.convertToCassandraColumn(bindableValue, findTypeInformation(index, bindableValue, property)));
+		return converter.convertToCassandraColumn(Optional.ofNullable(bindableValue),
+				findTypeInformation(index, bindableValue, property)).orElse(null);
 	}
 
 	private TypeInformation<?> findTypeInformation(int index, Object bindableValue,
