@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import org.codehaus.jackson.map.ObjectMapper;
@@ -86,10 +87,13 @@ public class CustomConversionTests extends AbstractKeyspaceCreatingIntegrationTe
 
 		cassandraOperations.insert(employee);
 
-		Row row = cassandraOperations.selectOne(QueryBuilder.select("id", "person").from("employee"), Row.class);
+		Optional<Row> row = cassandraOperations.selectOne(QueryBuilder.select("id", "person").from("employee"), Row.class);
 
-		assertThat(row.getString("id")).isEqualTo("employee-id");
-		assertThat(row.getString("person")).contains("\"firstname\":\"Homer\"");
+		assertThat(row).hasValueSatisfying(actual -> {
+
+			assertThat(actual.getString("id")).isEqualTo("employee-id");
+			assertThat(actual.getString("person")).contains("\"firstname\":\"Homer\"");
+		});
 	}
 
 	@Test // DATACASS-296
@@ -103,10 +107,13 @@ public class CustomConversionTests extends AbstractKeyspaceCreatingIntegrationTe
 		employee.setPerson(new Person("Homer", "Simpson"));
 		cassandraOperations.update(employee);
 
-		Row row = cassandraOperations.selectOne(QueryBuilder.select("id", "person").from("employee"), Row.class);
+		Optional<Row> row = cassandraOperations.selectOne(QueryBuilder.select("id", "person").from("employee"), Row.class);
 
-		assertThat(row.getString("id")).isEqualTo("employee-id");
-		assertThat(row.getString("person")).contains("\"firstname\":\"Homer\"");
+		assertThat(row).hasValueSatisfying(actual -> {
+
+			assertThat(actual.getString("id")).isEqualTo("employee-id");
+			assertThat(actual.getString("person")).contains("\"firstname\":\"Homer\"");
+		});
 	}
 
 	@Test // DATACASS-296
@@ -120,14 +127,17 @@ public class CustomConversionTests extends AbstractKeyspaceCreatingIntegrationTe
 		employee.setPeople(Collections.singleton(new Person("Apu", "Nahasapeemapetilon")));
 		cassandraOperations.update(employee);
 
-		Row row = cassandraOperations.selectOne(QueryBuilder.select("id", "person", "friends", "people").from("employee"),
-				Row.class);
+		Optional<Row> row = cassandraOperations
+				.selectOne(QueryBuilder.select("id", "person", "friends", "people").from("employee"), Row.class);
 
-		assertThat(row.getObject("friends")).isInstanceOf(List.class);
-		assertThat(row.getList("friends", String.class)).hasSize(2);
+		assertThat(row).hasValueSatisfying(actual -> {
 
-		assertThat(row.getObject("people")).isInstanceOf(Set.class);
-		assertThat(row.getSet("people", String.class)).hasSize(1);
+			assertThat(actual.getObject("friends")).isInstanceOf(List.class);
+			assertThat(actual.getList("friends", String.class)).hasSize(2);
+
+			assertThat(actual.getObject("people")).isInstanceOf(Set.class);
+			assertThat(actual.getSet("people", String.class)).hasSize(1);
+		});
 	}
 
 	@Test // DATACASS-296
@@ -140,14 +150,17 @@ public class CustomConversionTests extends AbstractKeyspaceCreatingIntegrationTe
 
 		cassandraOperations.insert(employee);
 
-		Row row = cassandraOperations.selectOne(QueryBuilder.select("id", "person", "friends", "people").from("employee"),
-				Row.class);
+		Optional<Row> row = cassandraOperations
+				.selectOne(QueryBuilder.select("id", "person", "friends", "people").from("employee"), Row.class);
 
-		assertThat(row.getObject("friends")).isInstanceOf(List.class);
-		assertThat(row.getList("friends", String.class)).hasSize(2);
+		assertThat(row).hasValueSatisfying(actual -> {
 
-		assertThat(row.getObject("people")).isInstanceOf(Set.class);
-		assertThat(row.getSet("people", String.class)).hasSize(1);
+			assertThat(actual.getObject("friends")).isInstanceOf(List.class);
+			assertThat(actual.getList("friends", String.class)).hasSize(2);
+
+			assertThat(actual.getObject("people")).isInstanceOf(Set.class);
+			assertThat(actual.getSet("people", String.class)).hasSize(1);
+		});
 	}
 
 	@Test // DATACASS-296
@@ -156,13 +169,16 @@ public class CustomConversionTests extends AbstractKeyspaceCreatingIntegrationTe
 		cassandraOperations.getCqlOperations().execute(QueryBuilder.insertInto("employee").value("id", "employee-id")
 				.value("person", "{\"firstname\":\"Homer\",\"lastname\":\"Simpson\"}"));
 
-		Employee employee = cassandraOperations.selectOne(QueryBuilder.select("id", "person").from("employee"),
+		Optional<Employee> employee = cassandraOperations.selectOne(QueryBuilder.select("id", "person").from("employee"),
 				Employee.class);
 
-		assertThat(employee.getId()).isEqualTo("employee-id");
-		assertThat(employee.getPerson()).isNotNull();
-		assertThat(employee.getPerson().getFirstname()).isEqualTo("Homer");
-		assertThat(employee.getPerson().getLastname()).isEqualTo("Simpson");
+		assertThat(employee).hasValueSatisfying(actual -> {
+
+			assertThat(actual.getId()).isEqualTo("employee-id");
+			assertThat(actual.getPerson()).isNotNull();
+			assertThat(actual.getPerson().getFirstname()).isEqualTo("Homer");
+			assertThat(actual.getPerson().getLastname()).isEqualTo("Simpson");
+		});
 	}
 
 	@Test // DATACASS-296
@@ -171,14 +187,16 @@ public class CustomConversionTests extends AbstractKeyspaceCreatingIntegrationTe
 		cassandraOperations.getCqlOperations().execute(QueryBuilder.insertInto("employee").value("id", "employee-id")
 				.value("people", Collections.singleton("{\"firstname\":\"Apu\",\"lastname\":\"Nahasapeemapetilon\"}")));
 
-		Employee employee = cassandraOperations.selectOne(QueryBuilder.select("id", "people").from("employee"),
+		Optional<Employee> employee = cassandraOperations.selectOne(QueryBuilder.select("id", "people").from("employee"),
 				Employee.class);
 
-		assertThat(employee.getId()).isEqualTo("employee-id");
-		assertThat(employee.getPeople()).isNotNull();
+		assertThat(employee).hasValueSatisfying(actual -> {
 
-		Person apu = employee.getPeople().iterator().next();
-		assertThat(apu.getFirstname()).isEqualTo("Apu");
+			assertThat(actual.getId()).isEqualTo("employee-id");
+			assertThat(actual.getPeople()).isNotNull();
+
+			assertThat(actual.getPeople()).extracting(Person::getFirstname).contains("Apu");
+		});
 	}
 
 	@Test // DATACASS-296

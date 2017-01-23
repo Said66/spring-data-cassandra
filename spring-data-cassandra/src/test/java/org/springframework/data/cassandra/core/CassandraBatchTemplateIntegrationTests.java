@@ -19,6 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Before;
@@ -62,7 +63,7 @@ public class CassandraBatchTemplateIntegrationTests extends AbstractKeyspaceCrea
 		CassandraBatchOperations batchOperations = new CassandraBatchTemplate(template);
 		batchOperations.insert(walter).insert(mike).execute();
 
-		Group loaded = template.selectOneById(walter.getId(), Group.class);
+		Group loaded = template.selectOneById(walter.getId(), Group.class).get();
 
 		assertThat(loaded.getId().getUsername()).isEqualTo(walter.getId().getUsername());
 	}
@@ -76,7 +77,7 @@ public class CassandraBatchTemplateIntegrationTests extends AbstractKeyspaceCrea
 		CassandraBatchOperations batchOperations = new CassandraBatchTemplate(template);
 		batchOperations.insert(Arrays.asList(walter, mike)).execute();
 
-		Group loaded = template.selectOneById(walter.getId(), Group.class);
+		Group loaded = template.selectOneById(walter.getId(), Group.class).get();
 
 		assertThat(loaded.getId().getUsername()).isEqualTo(walter.getId().getUsername());
 	}
@@ -84,8 +85,8 @@ public class CassandraBatchTemplateIntegrationTests extends AbstractKeyspaceCrea
 	@Test // DATACASS-288
 	public void shouldUpdateEntities() {
 
-		Group walter = template.insert(new Group(new GroupKey("users", "0x1", "walter")));
-		Group mike = template.insert(new Group(new GroupKey("users", "0x1", "mike")));
+		Group walter = template.insert(new Group(new GroupKey("users", "0x1", "walter"))).get();
+		Group mike = template.insert(new Group(new GroupKey("users", "0x1", "mike"))).get();
 
 		walter.setEmail("walter@white.com");
 		mike.setEmail("mike@sauls.com");
@@ -93,7 +94,7 @@ public class CassandraBatchTemplateIntegrationTests extends AbstractKeyspaceCrea
 		CassandraBatchOperations batchOperations = new CassandraBatchTemplate(template);
 		batchOperations.update(walter).update(mike).execute();
 
-		Group loaded = template.selectOneById(walter.getId(), Group.class);
+		Group loaded = template.selectOneById(walter.getId(), Group.class).get();
 
 		assertThat(loaded.getEmail()).isEqualTo(walter.getEmail());
 	}
@@ -101,8 +102,8 @@ public class CassandraBatchTemplateIntegrationTests extends AbstractKeyspaceCrea
 	@Test // DATACASS-288
 	public void shouldUpdateCollectionOfEntities() {
 
-		Group walter = template.insert(new Group(new GroupKey("users", "0x1", "walter")));
-		Group mike = template.insert(new Group(new GroupKey("users", "0x1", "mike")));
+		Group walter = template.insert(new Group(new GroupKey("users", "0x1", "walter"))).get();
+		Group mike = template.insert(new Group(new GroupKey("users", "0x1", "mike"))).get();
 
 		walter.setEmail("walter@white.com");
 		mike.setEmail("mike@sauls.com");
@@ -110,7 +111,7 @@ public class CassandraBatchTemplateIntegrationTests extends AbstractKeyspaceCrea
 		CassandraBatchOperations batchOperations = new CassandraBatchTemplate(template);
 		batchOperations.update(Arrays.asList(walter, mike)).execute();
 
-		Group loaded = template.selectOneById(walter.getId(), Group.class);
+		Group loaded = template.selectOneById(walter.getId(), Group.class).get();
 
 		assertThat(loaded.getEmail()).isEqualTo(walter.getEmail());
 	}
@@ -118,8 +119,8 @@ public class CassandraBatchTemplateIntegrationTests extends AbstractKeyspaceCrea
 	@Test // DATACASS-288
 	public void shouldUpdatesCollectionOfEntities() {
 
-		FlatGroup walter = template.insert(new FlatGroup("users", "0x1", "walter"));
-		FlatGroup mike = template.insert(new FlatGroup("users", "0x1", "mike"));
+		FlatGroup walter = template.insert(new FlatGroup("users", "0x1", "walter")).get();
+		FlatGroup mike = template.insert(new FlatGroup("users", "0x1", "mike")).get();
 
 		walter.setEmail("walter@white.com");
 		mike.setEmail("mike@sauls.com");
@@ -127,7 +128,7 @@ public class CassandraBatchTemplateIntegrationTests extends AbstractKeyspaceCrea
 		CassandraBatchOperations batchOperations = new CassandraBatchTemplate(template);
 		batchOperations.update(Arrays.asList(walter, mike)).execute();
 
-		FlatGroup loaded = template.selectOneById(walter, FlatGroup.class);
+		FlatGroup loaded = template.selectOneById(walter, FlatGroup.class).get();
 
 		assertThat(loaded.getEmail()).isEqualTo(walter.getEmail());
 	}
@@ -135,31 +136,31 @@ public class CassandraBatchTemplateIntegrationTests extends AbstractKeyspaceCrea
 	@Test // DATACASS-288
 	public void shouldDeleteEntities() {
 
-		Group walter = template.insert(new Group(new GroupKey("users", "0x1", "walter")));
-		Group mike = template.insert(new Group(new GroupKey("users", "0x1", "mike")));
+		Group walter = template.insert(new Group(new GroupKey("users", "0x1", "walter"))).get();
+		Group mike = template.insert(new Group(new GroupKey("users", "0x1", "mike"))).get();
 
 		CassandraBatchOperations batchOperations = new CassandraBatchTemplate(template);
 
 		batchOperations.delete(walter).delete(mike).execute();
 
-		Group loaded = template.selectOneById(walter.getId(), Group.class);
+		Optional<Group> loaded = template.selectOneById(walter.getId(), Group.class);
 
-		assertThat(loaded).isNull();
+		assertThat(loaded).isEmpty();
 	}
 
 	@Test // DATACASS-288
 	public void shouldDeleteCollectionOfEntities() {
 
-		Group walter = template.insert(new Group(new GroupKey("users", "0x1", "walter")));
-		Group mike = template.insert(new Group(new GroupKey("users", "0x1", "mike")));
+		Group walter = template.insert(new Group(new GroupKey("users", "0x1", "walter"))).get();
+		Group mike = template.insert(new Group(new GroupKey("users", "0x1", "mike"))).get();
 
 		CassandraBatchOperations batchOperations = new CassandraBatchTemplate(template);
 
 		batchOperations.delete(Arrays.asList(walter, mike)).execute();
 
-		Group loaded = template.selectOneById(walter.getId(), Group.class);
+		Optional<Group> loaded = template.selectOneById(walter.getId(), Group.class);
 
-		assertThat(loaded).isNull();
+		assertThat(loaded).isEmpty();
 	}
 
 	@Test // DATACASS-288

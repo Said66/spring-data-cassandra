@@ -213,7 +213,7 @@ public class MappingCassandraConverterUDTIntegrationTests extends AbstractSpring
 	public void shouldWriteUdt() {
 
 		CassandraPersistentEntity<?> persistentEntity = converter.getMappingContext()
-				.getPersistentEntity(AddressUserType.class);
+				.getRequiredPersistentEntity(AddressUserType.class);
 		UDTValue udtValue = persistentEntity.getUserType().newValue();
 		udtValue.setString("zip", "69469");
 		udtValue.setString("city", "Weinheim");
@@ -252,7 +252,7 @@ public class MappingCassandraConverterUDTIntegrationTests extends AbstractSpring
 	public void shouldWriteMappedUdtPk() {
 
 		CassandraPersistentEntity<?> persistentEntity = converter.getMappingContext()
-				.getPersistentEntity(AddressUserType.class);
+				.getRequiredPersistentEntity(AddressUserType.class);
 		UDTValue udtValue = persistentEntity.getUserType().newValue();
 		udtValue.setString("zip", "69469");
 		udtValue.setString("city", "Weinheim");

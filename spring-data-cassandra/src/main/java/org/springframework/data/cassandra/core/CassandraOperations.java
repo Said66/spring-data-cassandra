@@ -17,9 +17,8 @@ package org.springframework.data.cassandra.core;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
-
-import com.datastax.driver.core.Statement;
 
 import org.springframework.cassandra.core.CqlOperations;
 import org.springframework.cassandra.core.QueryOptions;
@@ -27,6 +26,8 @@ import org.springframework.cassandra.core.WriteOptions;
 import org.springframework.cassandra.core.cql.CqlIdentifier;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.cassandra.convert.CassandraConverter;
+
+import com.datastax.driver.core.Statement;
 
 /**
  * Interface specifying a basic set of Cassandra operations. Implemented by {@link CassandraTemplate}. Not often used
@@ -109,7 +110,7 @@ public interface CassandraOperations {
 	 * @return the converted object or {@literal null}.
 	 * @throws DataAccessException if there is any problem executing the query.
 	 */
-	<T> T selectOne(String cql, Class<T> entityClass) throws DataAccessException;
+	<T> Optional<T> selectOne(String cql, Class<T> entityClass) throws DataAccessException;
 
 	// -------------------------------------------------------------------------
 	// Methods dealing with com.datastax.driver.core.Statement
@@ -147,7 +148,7 @@ public interface CassandraOperations {
 	 * @return the converted object or {@literal null}.
 	 * @throws DataAccessException if there is any problem executing the query.
 	 */
-	<T> T selectOne(Statement statement, Class<T> entityClass) throws DataAccessException;
+	<T> Optional<T> selectOne(Statement statement, Class<T> entityClass) throws DataAccessException;
 
 	// -------------------------------------------------------------------------
 	// Methods dealing with entities
@@ -180,7 +181,7 @@ public interface CassandraOperations {
 	 * @return the converted object or {@literal null}.
 	 * @throws DataAccessException if there is any problem executing the query.
 	 */
-	<T> T selectOneById(Object id, Class<T> entityClass) throws DataAccessException;
+	<T> Optional<T> selectOneById(Object id, Class<T> entityClass) throws DataAccessException;
 
 	/**
 	 * Select objects for the given {@code entityClass} and {@code ids}.
@@ -199,7 +200,7 @@ public interface CassandraOperations {
 	 * @return the inserted entity.
 	 * @throws DataAccessException if there is any problem executing the query.
 	 */
-	<T> T insert(T entity) throws DataAccessException;
+	<T> Optional<T> insert(T entity) throws DataAccessException;
 
 	/**
 	 * Insert the given entity applying {@link WriteOptions} and return the entity if the insert was applied.
@@ -209,7 +210,7 @@ public interface CassandraOperations {
 	 * @return the inserted entity.
 	 * @throws DataAccessException if there is any problem executing the query.
 	 */
-	<T> T insert(T entity, WriteOptions options) throws DataAccessException;
+	<T> Optional<T> insert(T entity, WriteOptions options) throws DataAccessException;
 
 	/**
 	 * Update the given entity and return the entity if the update was applied.
@@ -218,7 +219,7 @@ public interface CassandraOperations {
 	 * @return the updated entity.
 	 * @throws DataAccessException if there is any problem executing the query.
 	 */
-	<T> T update(T entity) throws DataAccessException;
+	<T> Optional<T> update(T entity) throws DataAccessException;
 
 	/**
 	 * Update the given entity applying {@link WriteOptions} and return the entity if the update was applied.
@@ -228,7 +229,7 @@ public interface CassandraOperations {
 	 * @return the updated entity.
 	 * @throws DataAccessException if there is any problem executing the query.
 	 */
-	<T> T update(T entity, WriteOptions options) throws DataAccessException;
+	<T> Optional<T> update(T entity, WriteOptions options) throws DataAccessException;
 
 	/**
 	 * Delete the given entity and return the entity if the delete was applied.
@@ -237,7 +238,7 @@ public interface CassandraOperations {
 	 * @return the deleted entity.
 	 * @throws DataAccessException if there is any problem executing the query.
 	 */
-	<T> T delete(T entity) throws DataAccessException;
+	<T> Optional<T> delete(T entity) throws DataAccessException;
 
 	/**
 	 * Delete the given entity applying {@link QueryOptions} and return the entity if the delete was applied.
@@ -247,7 +248,7 @@ public interface CassandraOperations {
 	 * @return the deleted entity.
 	 * @throws DataAccessException if there is any problem executing the query.
 	 */
-	<T> T delete(T entity, QueryOptions options) throws DataAccessException;
+	<T> Optional<T> delete(T entity, QueryOptions options) throws DataAccessException;
 
 	/**
 	 * Remove the given object from the table by id.

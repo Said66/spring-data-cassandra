@@ -43,7 +43,7 @@ class DtoInstantiatingConverter implements Converter<Object, Object> {
 
 	private final MappingContext<? extends PersistentEntity<?, ?>, ? extends PersistentProperty<?>> context;
 
-	private final EntityInstantiator instantiator;
+	private final Optional<EntityInstantiator> instantiator;
 
 	/**
 	 * Creates a new {@link Converter} to instantiate DTOs.
@@ -62,7 +62,8 @@ class DtoInstantiatingConverter implements Converter<Object, Object> {
 
 		this.targetType = dtoType;
 		this.context = context;
-		this.instantiator = instantiator.getInstantiatorFor(context.getRequiredPersistentEntity(dtoType));
+
+		this.instantiator = context.getPersistentEntity(dtoType).map(instantiator::getInstantiatorFor);
 	}
 
 	/*
@@ -79,6 +80,9 @@ class DtoInstantiatingConverter implements Converter<Object, Object> {
 		PersistentEntity<?, ?> sourceEntity = context.getRequiredPersistentEntity(source.getClass());
 		PersistentPropertyAccessor sourceAccessor = sourceEntity.getPropertyAccessor(source);
 		PersistentEntity<?, ?> targetEntity = context.getRequiredPersistentEntity(targetType);
+
+		EntityInstantiator instantiator = this.instantiator.orElseThrow(
+				() -> new IllegalStateException(String.format("No EntityInstantiator for [%s] available", targetType)));
 
 		@SuppressWarnings({ "rawtypes", "unchecked" })
 		Object dto = instantiator.createInstance(targetEntity, new ParameterValueProvider() {

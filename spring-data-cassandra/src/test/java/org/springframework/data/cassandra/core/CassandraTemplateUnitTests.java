@@ -23,6 +23,7 @@ import static org.mockito.Mockito.anyInt;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.Before;
 import org.junit.Ignore;
@@ -124,9 +125,9 @@ public class CassandraTemplateUnitTests {
 		when(row.getObject(1)).thenReturn("Walter");
 		when(row.getObject(2)).thenReturn("White");
 
-		Person person = template.selectOne("SELECT * FROM person WHERE id='myid';", Person.class);
+		Optional<Person> person = template.selectOne("SELECT * FROM person WHERE id='myid';", Person.class);
 
-		assertThat(person).isEqualTo(new Person("myid", "Walter", "White"));
+		assertThat(person).contains(new Person("myid", "Walter", "White"));
 		verify(session).execute(statementCaptor.capture());
 		assertThat(statementCaptor.getValue().toString()).isEqualTo("SELECT * FROM person WHERE id='myid';");
 	}
@@ -146,9 +147,9 @@ public class CassandraTemplateUnitTests {
 		when(row.getObject(1)).thenReturn("Walter");
 		when(row.getObject(2)).thenReturn("White");
 
-		Person person = template.selectOneById("myid", Person.class);
+		Optional<Person> person = template.selectOneById("myid", Person.class);
 
-		assertThat(person).isEqualTo(new Person("myid", "Walter", "White"));
+		assertThat(person).contains(new Person("myid", "Walter", "White"));
 		verify(session).execute(statementCaptor.capture());
 		assertThat(statementCaptor.getValue().toString()).isEqualTo("SELECT * FROM person WHERE id='myid';");
 	}
@@ -200,9 +201,9 @@ public class CassandraTemplateUnitTests {
 
 		Person person = new Person("heisenberg", "Walter", "White");
 
-		Person inserted = template.insert(person);
+		Optional<Person> inserted = template.insert(person);
 
-		assertThat(inserted).isEqualTo(person);
+		assertThat(inserted).contains(person);
 		verify(session).execute(statementCaptor.capture());
 		assertThat(statementCaptor.getValue().toString())
 				.isEqualTo("INSERT INTO person (firstname,id,lastname) VALUES ('Walter','heisenberg','White');");
@@ -230,9 +231,9 @@ public class CassandraTemplateUnitTests {
 
 		Person person = new Person("heisenberg", "Walter", "White");
 
-		Person inserted = template.insert(person);
+		Optional<Person> inserted = template.insert(person);
 
-		assertThat(inserted).isNull();
+		assertThat(inserted).isEmpty();
 	}
 
 	@Test // DATACASS-292
@@ -242,9 +243,9 @@ public class CassandraTemplateUnitTests {
 
 		Person person = new Person("heisenberg", "Walter", "White");
 
-		Person updated = template.update(person);
+		Optional<Person> updated = template.update(person);
 
-		assertThat(updated).isEqualTo(person);
+		assertThat(updated).contains(person);
 		verify(session).execute(statementCaptor.capture());
 		assertThat(statementCaptor.getValue().toString())
 				.isEqualTo("UPDATE person SET firstname='Walter',lastname='White' WHERE id='heisenberg';");
@@ -272,9 +273,9 @@ public class CassandraTemplateUnitTests {
 
 		Person person = new Person("heisenberg", "Walter", "White");
 
-		Person updated = template.update(person);
+		Optional<Person> updated = template.update(person);
 
-		assertThat(updated).isNull();
+		assertThat(updated).isNotPresent();
 	}
 
 	@Test // DATACASS-292
@@ -298,9 +299,9 @@ public class CassandraTemplateUnitTests {
 
 		Person person = new Person("heisenberg", "Walter", "White");
 
-		Person deleted = template.delete(person);
+		Optional<Person> deleted = template.delete(person);
 
-		assertThat(deleted).isEqualTo(person);
+		assertThat(deleted).contains(person);
 		verify(session).execute(statementCaptor.capture());
 		assertThat(statementCaptor.getValue().toString()).isEqualTo("DELETE FROM person WHERE id='heisenberg';");
 	}
@@ -327,9 +328,9 @@ public class CassandraTemplateUnitTests {
 
 		Person person = new Person("heisenberg", "Walter", "White");
 
-		Person deleted = template.delete(person);
+		Optional<Person> deleted = template.delete(person);
 
-		assertThat(deleted).isNull();
+		assertThat(deleted).isEmpty();
 	}
 
 	@Test // DATACASS-292

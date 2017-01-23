@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import org.junit.Before;
@@ -84,11 +85,14 @@ public class CollectionsRowValueProviderIntegrationTests extends AbstractKeyspac
 		Select select = QueryBuilder.select().all().from("bookHistory");
 		select.where(QueryBuilder.eq("isbn", "123456-1"));
 
-		BookHistory b = operations.selectOne(select, BookHistory.class);
+		Optional<BookHistory> result = operations.selectOne(select, BookHistory.class);
 
-		assertThat(b.getCheckOuts()).isNotNull();
-		assertThat("Spring Data Cassandra Guide").isEqualTo(b.getTitle());
-		assertThat("Cassandra Guru").isEqualTo(b.getAuthor());
+		assertThat(result).hasValueSatisfying(actual -> {
+
+			assertThat(actual.getCheckOuts()).isNotNull();
+			assertThat(actual.getTitle()).isEqualTo("Spring Data Cassandra Guide");
+			assertThat(actual.getAuthor()).isEqualTo("Cassandra Guru");
+		});
 
 	}
 
@@ -120,12 +124,15 @@ public class CollectionsRowValueProviderIntegrationTests extends AbstractKeyspac
 		Select select = QueryBuilder.select().all().from("bookReference");
 		select.where(QueryBuilder.eq("isbn", "123456-1"));
 
-		BookReference b = operations.selectOne(select, BookReference.class);
+		Optional<BookReference> result = operations.selectOne(select, BookReference.class);
 
-		assertThat(b.getReferences()).isNotNull();
-		assertThat(b.getBookmarks()).isNotNull();
-		assertThat("Spring Data Cassandra Guide").isEqualTo(b.getTitle());
-		assertThat("Cassandra Guru").isEqualTo(b.getAuthor());
+		assertThat(result).hasValueSatisfying(actual -> {
+
+			assertThat(actual.getReferences()).isNotNull();
+			assertThat(actual.getBookmarks()).isNotNull();
+			assertThat(actual.getTitle()).isEqualTo("Spring Data Cassandra Guide");
+			assertThat(actual.getAuthor()).isEqualTo("Cassandra Guru");
+		});
 
 	}
 }

@@ -17,6 +17,7 @@ package org.springframework.data.cassandra.core;
 
 import static org.assertj.core.api.Assertions.*;
 
+import java.util.Optional;
 import java.util.concurrent.Future;
 
 import org.junit.Before;
@@ -53,12 +54,12 @@ public class AsyncCassandraTemplateIntegrationTests extends AbstractKeyspaceCrea
 
 		Person person = new Person("heisenberg", "Walter", "White");
 
-		assertThat(getUninterruptibly(template.selectOneById(person.getId(), Person.class))).isNull();
+		assertThat(getUninterruptibly(template.selectOneById(person.getId(), Person.class))).isNotPresent();
 
-		ListenableFuture<Person> insert = template.insert(person);
+		ListenableFuture<Optional<Person>> insert = template.insert(person);
 
-		assertThat(getUninterruptibly(insert)).isNotNull().isEqualTo(person);
-		assertThat(getUninterruptibly(template.selectOneById(person.getId(), Person.class))).isEqualTo(person);
+		assertThat(getUninterruptibly(insert)).contains(person);
+		assertThat(getUninterruptibly(template.selectOneById(person.getId(), Person.class))).contains(person);
 	}
 
 	@Test // DATACASS-292
@@ -66,7 +67,7 @@ public class AsyncCassandraTemplateIntegrationTests extends AbstractKeyspaceCrea
 
 		Person person = new Person("heisenberg", "Walter", "White");
 
-		template.insert(person).get();
+		getUninterruptibly(template.insert(person));
 
 		ListenableFuture<Long> count = template.count(Person.class);
 		assertThat(getUninterruptibly(count)).isEqualTo(1L);
@@ -76,37 +77,37 @@ public class AsyncCassandraTemplateIntegrationTests extends AbstractKeyspaceCrea
 	public void updateShouldUpdateEntity() throws Exception {
 
 		Person person = new Person("heisenberg", "Walter", "White");
-		template.insert(person).get();
+		getUninterruptibly(template.insert(person));
 
 		person.setFirstname("Walter Hartwell");
-		Person updated = template.update(person).get();
-		assertThat(updated).isNotNull();
+		Optional<Person> updated = getUninterruptibly(template.update(person));
 
-		assertThat(getUninterruptibly(template.selectOneById(person.getId(), Person.class))).isEqualTo(person);
+		assertThat(updated).isPresent();
+		assertThat(getUninterruptibly(template.selectOneById(person.getId(), Person.class))).contains(person);
 	}
 
 	@Test // DATACASS-292
 	public void deleteShouldRemoveEntity() throws Exception {
 
 		Person person = new Person("heisenberg", "Walter", "White");
-		template.insert(person).get();
+		getUninterruptibly(template.insert(person));
 
-		Person deleted = template.delete(person).get();
-		assertThat(deleted).isNotNull();
+		Optional<Person> deleted = getUninterruptibly(template.delete(person));
 
-		assertThat(getUninterruptibly(template.selectOneById(person.getId(), Person.class))).isNull();
+		assertThat(deleted).isPresent();
+		assertThat(getUninterruptibly(template.selectOneById(person.getId(), Person.class))).isEmpty();
 	}
 
 	@Test // DATACASS-292
 	public void deleteByIdShouldRemoveEntity() throws Exception {
 
 		Person person = new Person("heisenberg", "Walter", "White");
-		template.insert(person).get();
+		getUninterruptibly(template.insert(person));
 
-		Boolean deleted = template.deleteById(person.getId(), Person.class).get();
+		Boolean deleted = getUninterruptibly(template.deleteById(person.getId(), Person.class));
 		assertThat(deleted).isTrue();
 
-		assertThat(getUninterruptibly(template.selectOneById(person.getId(), Person.class))).isNull();
+		assertThat(getUninterruptibly(template.selectOneById(person.getId(), Person.class))).isNotPresent();
 	}
 
 	private static <T> T getUninterruptibly(Future<T> future) {

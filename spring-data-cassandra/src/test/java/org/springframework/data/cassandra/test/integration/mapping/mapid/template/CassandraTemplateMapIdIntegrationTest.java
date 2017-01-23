@@ -58,28 +58,28 @@ public class CassandraTemplateMapIdIntegrationTest extends AbstractKeyspaceCreat
 		// insert
 		SinglePkc inserted = new SinglePkc(uuid());
 		inserted.setValue(uuid());
-		SinglePkc saved = operations.insert(inserted);
+		SinglePkc saved = operations.insert(inserted).get();
 		assertThat(inserted).isSameAs(saved);
 
 		// select
 		MapId id = id("key", saved.getKey());
-		SinglePkc selected = operations.selectOneById(id, SinglePkc.class);
+		SinglePkc selected = operations.selectOneById(id, SinglePkc.class).get();
 		assertThat(saved).isNotSameAs(selected);
 		assertThat(selected.getKey()).isEqualTo(saved.getKey());
 		assertThat(selected.getValue()).isEqualTo(saved.getValue());
 
 		// update
 		selected.setValue(uuid());
-		SinglePkc updated = operations.update(selected);
+		SinglePkc updated = operations.update(selected).get();
 		assertThat(selected).isSameAs(updated);
 
-		selected = operations.selectOneById(id, SinglePkc.class);
+		selected = operations.selectOneById(id, SinglePkc.class).get();
 		assertThat(updated).isNotSameAs(selected);
 		assertThat(selected.getValue()).isEqualTo(updated.getValue());
 
 		// delete
 		operations.delete(selected);
-		assertThat(operations.selectOneById(id, SinglePkc.class)).isNull();
+		assertThat(operations.selectOneById(id, SinglePkc.class)).isEmpty();
 	}
 
 	@Table
@@ -116,12 +116,12 @@ public class CassandraTemplateMapIdIntegrationTest extends AbstractKeyspaceCreat
 		// insert
 		MultiPkc inserted = new MultiPkc(uuid(), uuid());
 		inserted.setValue(uuid());
-		MultiPkc saved = operations.insert(inserted);
+		MultiPkc saved = operations.insert(inserted).get();
 		assertThat(inserted).isSameAs(saved);
 
 		// select
 		MapId id = id("key0", saved.getKey0()).with("key1", saved.getKey1());
-		MultiPkc selected = operations.selectOneById(id, MultiPkc.class);
+		MultiPkc selected = operations.selectOneById(id, MultiPkc.class).get();
 		assertThat(saved).isNotSameAs(selected);
 		assertThat(selected.getKey0()).isEqualTo(saved.getKey0());
 		assertThat(selected.getKey1()).isEqualTo(saved.getKey1());
@@ -129,16 +129,16 @@ public class CassandraTemplateMapIdIntegrationTest extends AbstractKeyspaceCreat
 
 		// update
 		selected.setValue(uuid());
-		MultiPkc updated = operations.update(selected);
+		MultiPkc updated = operations.update(selected).get();
 		assertThat(selected).isSameAs(updated);
 
-		selected = operations.selectOneById(id, MultiPkc.class);
+		selected = operations.selectOneById(id, MultiPkc.class).get();
 		assertThat(updated).isNotSameAs(selected);
 		assertThat(selected.getValue()).isEqualTo(updated.getValue());
 
 		// delete
 		operations.delete(selected);
-		assertThat(operations.selectOneById(id, MultiPkc.class)).isNull();
+		assertThat(operations.selectOneById(id, MultiPkc.class)).isEmpty();
 	}
 
 	@Table

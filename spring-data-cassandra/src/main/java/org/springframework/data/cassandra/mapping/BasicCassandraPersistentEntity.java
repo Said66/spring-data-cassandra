@@ -59,7 +59,7 @@ public class BasicCassandraPersistentEntity<T> extends BasicPersistentEntity<T, 
 
 	protected ApplicationContext context;
 
-	protected Boolean forceQuote;
+	protected Optional<Boolean> forceQuote = Optional.empty();
 
 	protected CassandraMappingContext mappingContext;
 
@@ -121,7 +121,7 @@ public class BasicCassandraPersistentEntity<T> extends BasicPersistentEntity<T, 
 
 	@Override
 	public boolean isCompositePrimaryKey() {
-		return (findAnnotation(PrimaryKeyClass.class) != null);
+		return findAnnotation(PrimaryKeyClass.class).isPresent();
 	}
 
 	@Override
@@ -183,8 +183,12 @@ public class BasicCassandraPersistentEntity<T> extends BasicPersistentEntity<T, 
 
 	@Override
 	public void setForceQuote(boolean forceQuote) {
-		if (this.forceQuote == null || this.forceQuote != forceQuote) {
-			this.forceQuote = forceQuote;
+
+		boolean changed = !this.forceQuote.isPresent() || this.forceQuote.filter(v -> v != forceQuote).isPresent();
+
+		this.forceQuote = Optional.of(forceQuote);
+
+		if (changed) {
 			setTableName(cqlId(getTableName().getUnquoted(), forceQuote));
 		}
 	}

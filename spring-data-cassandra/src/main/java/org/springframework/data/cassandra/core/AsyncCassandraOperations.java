@@ -16,6 +16,7 @@
 package org.springframework.data.cassandra.core;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 import org.springframework.cassandra.core.AsyncCqlOperations;
@@ -89,7 +90,7 @@ public interface AsyncCassandraOperations {
 	 * @return the converted object or {@literal null}.
 	 * @throws DataAccessException if there is any problem executing the query.
 	 */
-	<T> ListenableFuture<T> selectOne(String cql, Class<T> entityClass) throws DataAccessException;
+	<T> ListenableFuture<Optional<T>> selectOne(String cql, Class<T> entityClass) throws DataAccessException;
 
 	// -------------------------------------------------------------------------
 	// Methods dealing with com.datastax.driver.core.Statement
@@ -126,7 +127,7 @@ public interface AsyncCassandraOperations {
 	 * @return the converted object or {@literal null}.
 	 * @throws DataAccessException if there is any problem executing the query.
 	 */
-	<T> ListenableFuture<T> selectOne(Statement statement, Class<T> entityClass) throws DataAccessException;
+	<T> ListenableFuture<Optional<T>> selectOne(Statement statement, Class<T> entityClass) throws DataAccessException;
 
 	// -------------------------------------------------------------------------
 	// Methods dealing with entities
@@ -159,7 +160,7 @@ public interface AsyncCassandraOperations {
 	 * @return the converted object or {@literal null}.
 	 * @throws DataAccessException if there is any problem executing the query.
 	 */
-	<T> ListenableFuture<T> selectOneById(Object id, Class<T> entityClass) throws DataAccessException;
+	<T> ListenableFuture<Optional<T>> selectOneById(Object id, Class<T> entityClass) throws DataAccessException;
 
 	/**
 	 * Insert the given entity and return the entity if the insert was applied.
@@ -168,7 +169,7 @@ public interface AsyncCassandraOperations {
 	 * @return the inserted entity.
 	 * @throws DataAccessException if there is any problem executing the query.
 	 */
-	<T> ListenableFuture<T> insert(T entity) throws DataAccessException;
+	<T> ListenableFuture<Optional<T>> insert(T entity) throws DataAccessException;
 
 	/**
 	 * Insert the given entity applying {@link WriteOptions} and return the entity if the insert was applied.
@@ -178,7 +179,7 @@ public interface AsyncCassandraOperations {
 	 * @return the inserted entity.
 	 * @throws DataAccessException if there is any problem executing the query.
 	 */
-	<T> ListenableFuture<T> insert(T entity, WriteOptions options) throws DataAccessException;
+	<T> ListenableFuture<Optional<T>> insert(T entity, WriteOptions options) throws DataAccessException;
 
 	/**
 	 * Update the given entity and return the entity if the update was applied.
@@ -187,7 +188,7 @@ public interface AsyncCassandraOperations {
 	 * @return the updated entity.
 	 * @throws DataAccessException if there is any problem executing the query.
 	 */
-	<T> ListenableFuture<T> update(T entity) throws DataAccessException;
+	<T> ListenableFuture<Optional<T>> update(T entity) throws DataAccessException;
 
 	/**
 	 * Update the given entity applying {@link WriteOptions} and return the entity if the update was applied.
@@ -197,7 +198,7 @@ public interface AsyncCassandraOperations {
 	 * @return the updated entity.
 	 * @throws DataAccessException if there is any problem executing the query.
 	 */
-	<T> ListenableFuture<T> update(T entity, WriteOptions options) throws DataAccessException;
+	<T> ListenableFuture<Optional<T>> update(T entity, WriteOptions options) throws DataAccessException;
 
 	/**
 	 * Delete the given entity and return the entity if the delete was applied.
@@ -206,7 +207,7 @@ public interface AsyncCassandraOperations {
 	 * @return the deleted entity.
 	 * @throws DataAccessException if there is any problem executing the query.
 	 */
-	<T> ListenableFuture<T> delete(T entity) throws DataAccessException;
+	<T> ListenableFuture<Optional<T>> delete(T entity) throws DataAccessException;
 
 	/**
 	 * Delete the given entity applying {@link QueryOptions} and return the entity if the delete was applied.
@@ -216,7 +217,7 @@ public interface AsyncCassandraOperations {
 	 * @return the deleted entity.
 	 * @throws DataAccessException if there is any problem executing the query.
 	 */
-	<T> ListenableFuture<T> delete(T entity, QueryOptions options) throws DataAccessException;
+	<T> ListenableFuture<Optional<T>> delete(T entity, QueryOptions options) throws DataAccessException;
 
 	/**
 	 * Remove the given object from the table by id.

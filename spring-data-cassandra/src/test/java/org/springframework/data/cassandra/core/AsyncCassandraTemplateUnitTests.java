@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -157,9 +158,10 @@ public class AsyncCassandraTemplateUnitTests {
 		when(row.getObject(1)).thenReturn("Walter");
 		when(row.getObject(2)).thenReturn("White");
 
-		ListenableFuture<Person> future = template.selectOne("SELECT * FROM person WHERE id='myid';", Person.class);
+		ListenableFuture<Optional<Person>> future = template.selectOne("SELECT * FROM person WHERE id='myid';",
+				Person.class);
 
-		assertThat(getUninterruptibly(future)).isEqualTo(new Person("myid", "Walter", "White"));
+		assertThat(getUninterruptibly(future)).contains(new Person("myid", "Walter", "White"));
 		verify(session).executeAsync(statementCaptor.capture());
 		assertThat(statementCaptor.getValue().toString()).isEqualTo("SELECT * FROM person WHERE id='myid';");
 	}
@@ -179,9 +181,9 @@ public class AsyncCassandraTemplateUnitTests {
 		when(row.getObject(1)).thenReturn("Walter");
 		when(row.getObject(2)).thenReturn("White");
 
-		ListenableFuture<Person> future = template.selectOneById("myid", Person.class);
+		ListenableFuture<Optional<Person>> future = template.selectOneById("myid", Person.class);
 
-		assertThat(getUninterruptibly(future)).isEqualTo(new Person("myid", "Walter", "White"));
+		assertThat(getUninterruptibly(future)).contains(new Person("myid", "Walter", "White"));
 		verify(session).executeAsync(statementCaptor.capture());
 		assertThat(statementCaptor.getValue().toString()).isEqualTo("SELECT * FROM person WHERE id='myid';");
 	}
@@ -233,9 +235,9 @@ public class AsyncCassandraTemplateUnitTests {
 
 		Person person = new Person("heisenberg", "Walter", "White");
 
-		ListenableFuture<Person> future = template.insert(person);
+		ListenableFuture<Optional<Person>> future = template.insert(person);
 
-		assertThat(getUninterruptibly(future)).isEqualTo(person);
+		assertThat(getUninterruptibly(future)).contains(person);
 		verify(session).executeAsync(statementCaptor.capture());
 		assertThat(statementCaptor.getValue().toString())
 				.isEqualTo("INSERT INTO person (firstname,id,lastname) VALUES ('Walter','heisenberg','White');");
@@ -248,7 +250,7 @@ public class AsyncCassandraTemplateUnitTests {
 		when(session.executeAsync(any(Statement.class)))
 				.thenReturn(TestResultSetFuture.failed(new NoHostAvailableException(Collections.emptyMap())));
 
-		ListenableFuture<Person> future = template.insert(new Person("heisenberg", "Walter", "White"));
+		ListenableFuture<Optional<Person>> future = template.insert(new Person("heisenberg", "Walter", "White"));
 
 		try {
 			future.get();
@@ -267,9 +269,9 @@ public class AsyncCassandraTemplateUnitTests {
 
 		Person person = new Person("heisenberg", "Walter", "White");
 
-		ListenableFuture<Person> future = template.insert(person);
+		ListenableFuture<Optional<Person>> future = template.insert(person);
 
-		assertThat(getUninterruptibly(future)).isNull();
+		assertThat(getUninterruptibly(future)).isEmpty();
 	}
 
 	@Test // DATACASS-292
@@ -279,9 +281,9 @@ public class AsyncCassandraTemplateUnitTests {
 
 		Person person = new Person("heisenberg", "Walter", "White");
 
-		ListenableFuture<Person> future = template.update(person);
+		ListenableFuture<Optional<Person>> future = template.update(person);
 
-		assertThat(getUninterruptibly(future)).isEqualTo(person);
+		assertThat(getUninterruptibly(future)).contains(person);
 		verify(session).executeAsync(statementCaptor.capture());
 		assertThat(statementCaptor.getValue().toString())
 				.isEqualTo("UPDATE person SET firstname='Walter',lastname='White' WHERE id='heisenberg';");
@@ -294,7 +296,7 @@ public class AsyncCassandraTemplateUnitTests {
 		when(session.executeAsync(any(Statement.class)))
 				.thenReturn(TestResultSetFuture.failed(new NoHostAvailableException(Collections.emptyMap())));
 
-		ListenableFuture<Person> future = template.update(new Person("heisenberg", "Walter", "White"));
+		ListenableFuture<Optional<Person>> future = template.update(new Person("heisenberg", "Walter", "White"));
 
 		try {
 			future.get();
@@ -313,9 +315,9 @@ public class AsyncCassandraTemplateUnitTests {
 
 		Person person = new Person("heisenberg", "Walter", "White");
 
-		ListenableFuture<Person> future = template.update(person);
+		ListenableFuture<Optional<Person>> future = template.update(person);
 
-		assertThat(getUninterruptibly(future)).isNull();
+		assertThat(getUninterruptibly(future)).isEmpty();
 	}
 
 	@Test // DATACASS-292
@@ -339,9 +341,9 @@ public class AsyncCassandraTemplateUnitTests {
 
 		Person person = new Person("heisenberg", "Walter", "White");
 
-		ListenableFuture<Person> future = template.delete(person);
+		ListenableFuture<Optional<Person>> future = template.delete(person);
 
-		assertThat(getUninterruptibly(future)).isEqualTo(person);
+		assertThat(getUninterruptibly(future)).contains(person);
 		verify(session).executeAsync(statementCaptor.capture());
 		assertThat(statementCaptor.getValue().toString()).isEqualTo("DELETE FROM person WHERE id='heisenberg';");
 	}
@@ -353,7 +355,7 @@ public class AsyncCassandraTemplateUnitTests {
 		when(session.executeAsync(any(Statement.class)))
 				.thenReturn(TestResultSetFuture.failed(new NoHostAvailableException(Collections.emptyMap())));
 
-		ListenableFuture<Person> future = template.delete(new Person("heisenberg", "Walter", "White"));
+		ListenableFuture<Optional<Person>> future = template.delete(new Person("heisenberg", "Walter", "White"));
 
 		try {
 			future.get();
@@ -372,9 +374,9 @@ public class AsyncCassandraTemplateUnitTests {
 
 		Person person = new Person("heisenberg", "Walter", "White");
 
-		ListenableFuture<Person> future = template.delete(person);
+		ListenableFuture<Optional<Person>> future = template.delete(person);
 
-		assertThat(getUninterruptibly(future)).isNull();
+		assertThat(getUninterruptibly(future)).isEmpty();
 	}
 
 	@Test // DATACASS-292

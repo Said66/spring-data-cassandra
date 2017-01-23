@@ -16,6 +16,7 @@
 package org.springframework.data.cassandra.repository.support;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -59,17 +60,22 @@ public class SimpleCassandraRepository<T, ID extends Serializable> implements Ty
 
 	@Override
 	public <S extends T> S save(S entity) {
-		return operations.insert(entity);
+		return operations.insert(entity).orElse(null);
 	}
 
 	@Override
 	public <S extends T> List<S> save(Iterable<S> entities) {
-		return operations.insert(CollectionUtils.toList(entities));
+
+		List<S> saved = new ArrayList<S>();
+		for (S entity : entities) {
+			operations.insert(entity).ifPresent(saved::add);
+		}
+		return saved;
 	}
 
 	@Override
 	public Optional<T> findOne(ID id) {
-		return Optional.ofNullable(operations.selectOneById(id, entityInformation.getJavaType()));
+		return operations.selectOneById(id, entityInformation.getJavaType());
 	}
 
 	@Override

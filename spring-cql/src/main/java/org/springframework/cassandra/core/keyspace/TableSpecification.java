@@ -79,7 +79,7 @@ public class TableSpecification<T> extends TableOptionsSpecification<TableSpecif
 	 * @param type The data type of the column, must not be {@literal null}.
 	 */
 	public T column(CqlIdentifier name, DataType type) {
-		return column(name, type, null, null);
+		return column(name, type, Optional.empty(), Optional.empty());
 	}
 
 	/**

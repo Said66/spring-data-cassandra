@@ -19,6 +19,7 @@ import static org.assertj.core.api.Assertions.*;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -65,12 +66,12 @@ public class CassandraTemplateIntegrationTests extends AbstractKeyspaceCreatingI
 
 		Person person = new Person("heisenberg", "Walter", "White");
 
-		assertThat(template.selectOneById(person.getId(), Person.class)).isNull();
+		assertThat(template.selectOneById(person.getId(), Person.class)).isNotPresent();
 
-		Person inserted = template.insert(person);
+		Optional<Person> inserted = template.insert(person);
 
-		assertThat(inserted).isNotNull().isEqualTo(person);
-		assertThat(template.selectOneById(person.getId(), Person.class)).isEqualTo(person);
+		assertThat(inserted).isPresent().contains(person);
+		assertThat(template.selectOneById(person.getId(), Person.class)).contains(person);
 	}
 
 	@Test // DATACASS-292
@@ -91,10 +92,11 @@ public class CassandraTemplateIntegrationTests extends AbstractKeyspaceCreatingI
 		template.insert(person);
 
 		person.setFirstname("Walter Hartwell");
-		Person updated = template.update(person);
-		assertThat(updated).isNotNull();
 
-		assertThat(template.selectOneById(person.getId(), Person.class)).isEqualTo(person);
+		Optional<Person> updated = template.update(person);
+
+		assertThat(updated).isPresent();
+		assertThat(template.selectOneById(person.getId(), Person.class)).contains(person);
 	}
 
 	@Test // DATACASS-292
@@ -103,10 +105,10 @@ public class CassandraTemplateIntegrationTests extends AbstractKeyspaceCreatingI
 		Person person = new Person("heisenberg", "Walter", "White");
 		template.insert(person);
 
-		Person deleted = template.delete(person);
-		assertThat(deleted).isNotNull();
+		Optional<Person> deleted = template.delete(person);
 
-		assertThat(template.selectOneById(person.getId(), Person.class)).isNull();
+		assertThat(deleted).isPresent();
+		assertThat(template.selectOneById(person.getId(), Person.class)).isEmpty();
 	}
 
 	@Test // DATACASS-292
@@ -118,7 +120,7 @@ public class CassandraTemplateIntegrationTests extends AbstractKeyspaceCreatingI
 		Boolean deleted = template.deleteById(person.getId(), Person.class);
 		assertThat(deleted).isTrue();
 
-		assertThat(template.selectOneById(person.getId(), Person.class)).isNull();
+		assertThat(template.selectOneById(person.getId(), Person.class)).isEmpty();
 	}
 
 	@Test // DATACASS-182
@@ -142,10 +144,13 @@ public class CassandraTemplateIntegrationTests extends AbstractKeyspaceCreatingI
 		person.setFirstname(null);
 		template.update(person);
 
-		Person loaded = template.selectOneById(person.getId(), Person.class);
+		Optional<Person> loaded = template.selectOneById(person.getId(), Person.class);
 
-		assertThat(loaded.getFirstname()).isNull();
-		assertThat(loaded.getId()).isEqualTo("heisenberg");
+		assertThat(loaded).hasValueSatisfying(actual -> {
+
+			assertThat(actual.getFirstname()).isNull();
+			assertThat(actual.getId()).isEqualTo("heisenberg");
+		});
 	}
 
 	@Test // DATACASS-182
@@ -158,10 +163,13 @@ public class CassandraTemplateIntegrationTests extends AbstractKeyspaceCreatingI
 		person.setFirstname(null);
 		template.insert(person);
 
-		Person loaded = template.selectOneById(person.getId(), Person.class);
+		Optional<Person> loaded = template.selectOneById(person.getId(), Person.class);
 
-		assertThat(loaded.getFirstname()).isNull();
-		assertThat(loaded.getId()).isEqualTo("heisenberg");
+		assertThat(loaded).hasValueSatisfying(actual -> {
+
+			assertThat(actual.getFirstname()).isNull();
+			assertThat(actual.getId()).isEqualTo("heisenberg");
+		});
 	}
 
 	@Test // DATACASS-182
@@ -178,10 +186,13 @@ public class CassandraTemplateIntegrationTests extends AbstractKeyspaceCreatingI
 
 		template.update(bookReference);
 
-		BookReference loaded = template.selectOneById(bookReference.getIsbn(), BookReference.class);
+		Optional<BookReference> loaded = template.selectOneById(bookReference.getIsbn(), BookReference.class);
 
-		assertThat(loaded.getTitle()).isNull();
-		assertThat(loaded.getBookmarks()).isNull();
+		assertThat(loaded).hasValueSatisfying(actual -> {
+
+			assertThat(actual.getTitle()).isNull();
+			assertThat(actual.getBookmarks()).isNull();
+		});
 	}
 
 	/**
@@ -199,17 +210,18 @@ public class CassandraTemplateIntegrationTests extends AbstractKeyspaceCreatingI
 		userToken.setUserComment("comment");
 		template.update(userToken);
 
-		UserToken loaded = template.selectOneById(
+		Optional<UserToken> loaded = template.selectOneById(
 				BasicMapId.id("userId", userToken.getUserId()).with("token", userToken.getToken()), UserToken.class);
 
-		assertThat(loaded).isNotNull();
-		assertThat(loaded.getUserComment()).isEqualTo("comment");
+		assertThat(loaded).hasValueSatisfying(actual -> {
+			assertThat(actual.getUserComment()).isEqualTo("comment");
+		});
 
 		template.delete(userToken);
 
-		UserToken loadAfterDelete = template.selectOneById(
+		Optional<UserToken> loadAfterDelete = template.selectOneById(
 				BasicMapId.id("userId", userToken.getUserId()).with("token", userToken.getToken()), UserToken.class);
 
-		assertThat(loadAfterDelete).isNull();
+		assertThat(loadAfterDelete).isEmpty();
 	}
 }

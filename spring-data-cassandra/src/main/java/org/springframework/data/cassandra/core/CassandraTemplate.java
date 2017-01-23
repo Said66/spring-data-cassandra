@@ -16,6 +16,7 @@
 package org.springframework.data.cassandra.core;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -165,7 +166,7 @@ public class CassandraTemplate implements CassandraOperations {
 	 * @see org.springframework.data.cassandra.core.CassandraOperations#selectOne(java.lang.String, java.lang.Class)
 	 */
 	@Override
-	public <T> T selectOne(String cql, Class<T> entityClass) {
+	public <T> Optional<T> selectOne(String cql, Class<T> entityClass) {
 
 		Assert.hasText(cql, "Statement must not be empty");
 		Assert.notNull(entityClass, "Entity type must not be null");
@@ -208,11 +209,11 @@ public class CassandraTemplate implements CassandraOperations {
 	 * @see org.springframework.data.cassandra.core.CassandraOperations#selectOne(com.datastax.driver.core.Statement, java.lang.Class)
 	 */
 	@Override
-	public <T> T selectOne(Statement statement, Class<T> entityClass) {
+	public <T> Optional<T> selectOne(Statement statement, Class<T> entityClass) {
 
 		List<T> result = select(statement, entityClass);
 
-		return (result.isEmpty() ? null : result.get(0));
+		return result.stream().findFirst();
 	}
 
 	// -------------------------------------------------------------------------
@@ -258,7 +259,7 @@ public class CassandraTemplate implements CassandraOperations {
 	 * @see org.springframework.data.cassandra.core.CassandraOperations#selectOneById(java.lang.Object, java.lang.Class)
 	 */
 	@Override
-	public <T> T selectOneById(Object id, Class<T> entityClass) {
+	public <T> Optional<T> selectOneById(Object id, Class<T> entityClass) {
 
 		Assert.notNull(id, "Id must not be null");
 		Assert.notNull(entityClass, "Entity type must not be null");
@@ -302,7 +303,7 @@ public class CassandraTemplate implements CassandraOperations {
 	 * @see org.springframework.data.cassandra.core.CassandraOperations#insert(java.lang.Object)
 	 */
 	@Override
-	public <T> T insert(T entity) {
+	public <T> Optional<T> insert(T entity) {
 		return insert(entity, null);
 	}
 
@@ -311,7 +312,7 @@ public class CassandraTemplate implements CassandraOperations {
 	 * @see org.springframework.data.cassandra.core.CassandraOperations#insert(java.lang.Object, org.springframework.cassandra.core.WriteOptions)
 	 */
 	@Override
-	public <T> T insert(T entity, WriteOptions options) {
+	public <T> Optional<T> insert(T entity, WriteOptions options) {
 
 		Assert.notNull(entity, "Entity must not be null");
 
@@ -325,7 +326,7 @@ public class CassandraTemplate implements CassandraOperations {
 	 * @see org.springframework.data.cassandra.core.CassandraOperations#update(java.lang.Object)
 	 */
 	@Override
-	public <T> T update(T entity) {
+	public <T> Optional<T> update(T entity) {
 		return update(entity, null);
 	}
 
@@ -334,7 +335,7 @@ public class CassandraTemplate implements CassandraOperations {
 	 * @see org.springframework.data.cassandra.core.CassandraOperations#update(java.lang.Object, org.springframework.cassandra.core.WriteOptions)
 	 */
 	@Override
-	public <T> T update(T entity, WriteOptions options) {
+	public <T> Optional<T> update(T entity, WriteOptions options) {
 
 		Assert.notNull(entity, "Entity must not be null");
 
@@ -348,7 +349,7 @@ public class CassandraTemplate implements CassandraOperations {
 	 * @see org.springframework.data.cassandra.core.CassandraOperations#delete(java.lang.Object)
 	 */
 	@Override
-	public <T> T delete(T entity) {
+	public <T> Optional<T> delete(T entity) {
 		return delete(entity, null);
 	}
 
@@ -357,7 +358,7 @@ public class CassandraTemplate implements CassandraOperations {
 	 * @see org.springframework.data.cassandra.core.CassandraOperations#delete(java.lang.Object, org.springframework.cassandra.core.QueryOptions)
 	 */
 	@Override
-	public <T> T delete(T entity, QueryOptions options) {
+	public <T> Optional<T> delete(T entity, QueryOptions options) {
 
 		Assert.notNull(entity, "Entity must not be null");
 
@@ -440,7 +441,7 @@ public class CassandraTemplate implements CassandraOperations {
 		return new CassandraBatchTemplate(this);
 	}
 
-	private static class StatementCallback<T> implements SessionCallback<T>, CqlProvider {
+	private static class StatementCallback<T> implements SessionCallback<Optional<T>>, CqlProvider {
 
 		private final Statement statement;
 		private final T entity;
@@ -451,8 +452,8 @@ public class CassandraTemplate implements CassandraOperations {
 		}
 
 		@Override
-		public T doInSession(Session session) throws DriverException, DataAccessException {
-			return session.execute(statement).wasApplied() ? entity : null;
+		public Optional<T> doInSession(Session session) throws DriverException, DataAccessException {
+			return session.execute(statement).wasApplied() ? Optional.ofNullable(entity) : Optional.empty();
 		}
 
 		@Override

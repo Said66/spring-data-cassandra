@@ -46,8 +46,8 @@ public class CassandraRepositoryBean<T> extends CdiRepositoryBean<T> {
 	 * @param qualifiers must not be {@literal null}.
 	 * @param repositoryType must not be {@literal null}.
 	 * @param beanManager must not be {@literal null}.
-	 * @param detector optional detector for the custom {@link org.springframework.data.repository.Repository} implementations
-	 *          {@link CustomRepositoryImplementationDetector}, can be {@literal null}.
+	 * @param detector optional detector for the custom {@link org.springframework.data.repository.Repository}
+	 *          implementations {@link CustomRepositoryImplementationDetector}, can be {@literal null}.
 	 */
 	public CassandraRepositoryBean(Bean<CassandraOperations> operations, Set<Annotation> qualifiers,
 			Class<T> repositoryType, BeanManager beanManager, Optional<CustomRepositoryImplementationDetector> detector) {
@@ -62,9 +62,16 @@ public class CassandraRepositoryBean<T> extends CdiRepositoryBean<T> {
 	 * @see org.springframework.data.repository.cdi.CdiRepositoryBean#create(javax.enterprise.context.spi.CreationalContext, java.lang.Class, java.util.Optional)
 	 */
 	@Override
-	protected T create(CreationalContext<T> creationalContext, Class<T> repositoryType, Optional<Object> customImplementation) {
+	protected T create(CreationalContext<T> creationalContext, Class<T> repositoryType,
+			Optional<Object> customImplementation) {
 		CassandraOperations cassandraOperations = getDependencyInstance(cassandraOperationsBean, CassandraOperations.class);
-		return new CassandraRepositoryFactory(cassandraOperations).getRepository(repositoryType, customImplementation);
+
+		if (customImplementation.isPresent()) {
+			return new CassandraRepositoryFactory(cassandraOperations).getRepository(repositoryType,
+					customImplementation.get());
+		}
+
+		return new CassandraRepositoryFactory(cassandraOperations).getRepository(repositoryType);
 	}
 
 	@Override

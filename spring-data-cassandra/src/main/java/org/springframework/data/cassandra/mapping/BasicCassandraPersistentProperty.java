@@ -35,7 +35,6 @@ import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.cassandra.util.SpelUtils;
 import org.springframework.data.mapping.Association;
-import org.springframework.data.mapping.PropertyHandler;
 import org.springframework.data.mapping.model.AnnotationBasedPersistentProperty;
 import org.springframework.data.mapping.model.MappingException;
 import org.springframework.data.mapping.model.Property;
@@ -297,11 +296,14 @@ public class BasicCassandraPersistentProperty extends AnnotationBasedPersistentP
 
 	protected DataType getDataTypeFor(Class<?> javaType) {
 
-		Optional<CassandraPersistentEntity<?>> persistentEntity = getOwner().getMappingContext()
+		Optional<CassandraPersistentEntity<?>> optionalEntity = getOwner().getMappingContext()
 				.getPersistentEntity(javaType);
 
-		if (persistentEntity.filter(CassandraPersistentEntity::isUserDefinedType).isPresent()) {
-			return persistentEntity.map(CassandraPersistentEntity::getUserType).get();
+		Optional<CassandraPersistentEntity<?>> udtEntity = optionalEntity
+				.filter(CassandraPersistentEntity::isUserDefinedType);
+
+		if (udtEntity.isPresent()) {
+			return udtEntity.map(CassandraPersistentEntity::getUserType).get();
 		}
 
 		DataType dataType = CassandraSimpleTypeHolder.getDataTypeFor(javaType);
@@ -379,15 +381,11 @@ public class BasicCassandraPersistentProperty extends AnnotationBasedPersistentP
 	protected void addCompositePrimaryKeyColumnNames(CassandraPersistentEntity<?> compositePrimaryKeyEntity,
 			final List<CqlIdentifier> columnNames) {
 
-		compositePrimaryKeyEntity.doWithProperties(new PropertyHandler<CassandraPersistentProperty>() {
-
-			@Override
-			public void doWithPersistentProperty(CassandraPersistentProperty property) {
-				if (property.isCompositePrimaryKey()) {
-					addCompositePrimaryKeyColumnNames(property.getCompositePrimaryKeyEntity(), columnNames);
-				} else {
-					columnNames.add(property.getColumnName());
-				}
+		compositePrimaryKeyEntity.getPersistentProperties().forEach(property -> {
+			if (property.isCompositePrimaryKey()) {
+				addCompositePrimaryKeyColumnNames(property.getCompositePrimaryKeyEntity(), columnNames);
+			} else {
+				columnNames.add(property.getColumnName());
 			}
 		});
 	}
@@ -458,7 +456,7 @@ public class BasicCassandraPersistentProperty extends AnnotationBasedPersistentP
 
 	@Override
 	public Optional<Association<CassandraPersistentProperty>> getAssociation() {
-		throw new UnsupportedOperationException("Cassandra does not support associations");
+		return Optional.empty();
 	}
 
 	@Override

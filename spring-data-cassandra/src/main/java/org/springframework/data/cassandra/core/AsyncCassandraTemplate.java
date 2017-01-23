@@ -16,6 +16,7 @@
 package org.springframework.data.cassandra.core;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -192,7 +193,7 @@ public class AsyncCassandraTemplate implements AsyncCassandraOperations {
 	 * @see org.springframework.data.cassandra.core.AsyncCassandraOperations#selectOne(java.lang.String, java.lang.Class)
 	 */
 	@Override
-	public <T> ListenableFuture<T> selectOne(String cql, Class<T> entityClass) {
+	public <T> ListenableFuture<Optional<T>> selectOne(String cql, Class<T> entityClass) {
 
 		Assert.hasText(cql, "Statement must not be empty");
 		Assert.notNull(entityClass, "Entity type must not be null");
@@ -235,10 +236,10 @@ public class AsyncCassandraTemplate implements AsyncCassandraOperations {
 	 * @see org.springframework.data.cassandra.core.AsyncCassandraOperations#selectOne(com.datastax.driver.core.Statement, java.lang.Class)
 	 */
 	@Override
-	public <T> ListenableFuture<T> selectOne(Statement statement, Class<T> entityClass) {
+	public <T> ListenableFuture<Optional<T>> selectOne(Statement statement, Class<T> entityClass) {
 
 		return new MappingListenableFutureAdapter<>(select(statement, entityClass),
-				list -> list.isEmpty() ? null : list.get(0));
+				list -> list.stream().findFirst());
 	}
 
 	// -------------------------------------------------------------------------
@@ -285,7 +286,7 @@ public class AsyncCassandraTemplate implements AsyncCassandraOperations {
 	 * @see org.springframework.data.cassandra.core.AsyncCassandraOperations#selectOneById(java.lang.Object, java.lang.Class)
 	 */
 	@Override
-	public <T> ListenableFuture<T> selectOneById(Object id, Class<T> entityClass) {
+	public <T> ListenableFuture<Optional<T>> selectOneById(Object id, Class<T> entityClass) {
 
 		Assert.notNull(id, "Id must not be null");
 		Assert.notNull(entityClass, "Entity type must not be null");
@@ -304,7 +305,7 @@ public class AsyncCassandraTemplate implements AsyncCassandraOperations {
 	 * @see org.springframework.data.cassandra.core.AsyncCassandraOperations#insert(java.lang.Object)
 	 */
 	@Override
-	public <T> ListenableFuture<T> insert(T entity) {
+	public <T> ListenableFuture<Optional<T>> insert(T entity) {
 		return insert(entity, null);
 	}
 
@@ -313,14 +314,14 @@ public class AsyncCassandraTemplate implements AsyncCassandraOperations {
 	 * @see org.springframework.data.cassandra.core.AsyncCassandraOperations#insert(java.lang.Object, org.springframework.cassandra.core.WriteOptions)
 	 */
 	@Override
-	public <T> ListenableFuture<T> insert(T entity, WriteOptions options) {
+	public <T> ListenableFuture<Optional<T>> insert(T entity, WriteOptions options) {
 
 		Assert.notNull(entity, "Entity must not be null");
 
 		Insert insert = QueryUtils.createInsertQuery(getTableName(entity).toCql(), entity, options, converter);
 
 		return new MappingListenableFutureAdapter<>(cqlOperations.execute(new AsyncStatementCallback(insert)),
-				resultSet -> resultSet.wasApplied() ? entity : null);
+				resultSet -> resultSet.wasApplied() ? Optional.of(entity) : Optional.empty());
 	}
 
 	/*
@@ -328,7 +329,7 @@ public class AsyncCassandraTemplate implements AsyncCassandraOperations {
 	 * @see org.springframework.data.cassandra.core.AsyncCassandraOperations#update(java.lang.Object)
 	 */
 	@Override
-	public <T> ListenableFuture<T> update(T entity) {
+	public <T> ListenableFuture<Optional<T>> update(T entity) {
 		return update(entity, null);
 	}
 
@@ -337,14 +338,14 @@ public class AsyncCassandraTemplate implements AsyncCassandraOperations {
 	 * @see org.springframework.data.cassandra.core.AsyncCassandraOperations#update(java.lang.Object, org.springframework.cassandra.core.WriteOptions)
 	 */
 	@Override
-	public <T> ListenableFuture<T> update(T entity, WriteOptions options) {
+	public <T> ListenableFuture<Optional<T>> update(T entity, WriteOptions options) {
 
 		Assert.notNull(entity, "Entity must not be null");
 
 		Update update = QueryUtils.createUpdateQuery(getTableName(entity).toCql(), entity, options, converter);
 
 		return new MappingListenableFutureAdapter<>(cqlOperations.execute(new AsyncStatementCallback(update)),
-				resultSet -> resultSet.wasApplied() ? entity : null);
+				resultSet -> resultSet.wasApplied() ? Optional.of(entity) : Optional.empty());
 	}
 
 	/*
@@ -352,7 +353,7 @@ public class AsyncCassandraTemplate implements AsyncCassandraOperations {
 	 * @see org.springframework.data.cassandra.core.AsyncCassandraOperations#delete(java.lang.Object)
 	 */
 	@Override
-	public <T> ListenableFuture<T> delete(T entity) {
+	public <T> ListenableFuture<Optional<T>> delete(T entity) {
 		return delete(entity, null);
 	}
 
@@ -361,14 +362,14 @@ public class AsyncCassandraTemplate implements AsyncCassandraOperations {
 	 * @see org.springframework.data.cassandra.core.AsyncCassandraOperations#delete(java.lang.Object, org.springframework.cassandra.core.QueryOptions)
 	 */
 	@Override
-	public <T> ListenableFuture<T> delete(T entity, QueryOptions options) {
+	public <T> ListenableFuture<Optional<T>> delete(T entity, QueryOptions options) {
 
 		Assert.notNull(entity, "Entity must not be null");
 
 		Delete delete = QueryUtils.createDeleteQuery(getTableName(entity).toCql(), entity, options, converter);
 
 		return new MappingListenableFutureAdapter<>(cqlOperations.execute(new AsyncStatementCallback(delete)),
-				resultSet -> resultSet.wasApplied() ? entity : null);
+				resultSet -> resultSet.wasApplied() ? Optional.of(entity) : Optional.empty());
 	}
 
 	/*

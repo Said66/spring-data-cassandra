@@ -16,6 +16,7 @@
 package org.springframework.data.cassandra.core;
 
 import java.util.Map;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +28,6 @@ import org.springframework.cassandra.core.cql.generator.DropUserTypeCqlGenerator
 import org.springframework.cassandra.core.keyspace.CreateTableSpecification;
 import org.springframework.cassandra.core.keyspace.DropTableSpecification;
 import org.springframework.cassandra.core.keyspace.DropUserTypeSpecification;
-import org.springframework.dao.DataAccessException;
 import org.springframework.data.cassandra.convert.CassandraConverter;
 import org.springframework.data.cassandra.mapping.CassandraPersistentEntity;
 import org.springframework.util.Assert;
@@ -103,13 +103,13 @@ public class CassandraAdminTemplate extends CassandraTemplate implements Cassand
 	 * @see org.springframework.data.cassandra.core.CassandraAdminOperations#getTableMetadata(java.lang.String, org.springframework.cassandra.core.cql.CqlIdentifier)
 	 */
 	@Override
-	public TableMetadata getTableMetadata(String keyspace, CqlIdentifier tableName) {
+	public Optional<TableMetadata> getTableMetadata(String keyspace, CqlIdentifier tableName) {
 
 		Assert.hasText(keyspace, "Keyspace name must not be empty");
 		Assert.notNull(tableName, "Table name must not be null");
 
-		return getCqlOperations().execute((SessionCallback<TableMetadata>) session -> session.getCluster().getMetadata()
-				.getKeyspace(keyspace).getTable(tableName.toCql()));
+		return Optional.ofNullable(getCqlOperations().execute((SessionCallback<TableMetadata>) session -> session
+				.getCluster().getMetadata().getKeyspace(keyspace).getTable(tableName.toCql())));
 	}
 
 	/*
@@ -119,19 +119,14 @@ public class CassandraAdminTemplate extends CassandraTemplate implements Cassand
 	@Override
 	public KeyspaceMetadata getKeyspaceMetadata() {
 
-		return getCqlOperations().execute(new SessionCallback<KeyspaceMetadata>() {
+		return getCqlOperations().execute((SessionCallback<KeyspaceMetadata>) session -> {
 
-			@Override
-			public KeyspaceMetadata doInSession(Session session) throws DataAccessException {
+			KeyspaceMetadata keyspaceMetadata = session.getCluster().getMetadata().getKeyspace(session.getLoggedKeyspace());
 
-				KeyspaceMetadata keyspaceMetadata = session.getCluster().getMetadata()
-					.getKeyspace(session.getLoggedKeyspace());
+			Assert.state(keyspaceMetadata != null,
+					String.format("Metadata for keyspace [%s] not available", session.getLoggedKeyspace()));
 
-				Assert.state(keyspaceMetadata != null, String.format("Metadata for keyspace [%s] not available",
-					session.getLoggedKeyspace()));
-
-				return keyspaceMetadata;
-			}
+			return keyspaceMetadata;
 		});
 	}
 }

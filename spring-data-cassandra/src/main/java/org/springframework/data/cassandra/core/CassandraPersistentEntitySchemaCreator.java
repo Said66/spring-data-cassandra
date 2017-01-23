@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.springframework.cassandra.core.cql.CqlIdentifier;
 import org.springframework.cassandra.core.cql.generator.CreateTableCqlGenerator;
@@ -33,6 +32,7 @@ import org.springframework.cassandra.core.keyspace.CreateTableSpecification;
 import org.springframework.cassandra.core.keyspace.CreateUserTypeSpecification;
 import org.springframework.data.cassandra.mapping.CassandraMappingContext;
 import org.springframework.data.cassandra.mapping.CassandraPersistentEntity;
+import org.springframework.data.util.Optionals;
 import org.springframework.util.Assert;
 
 /**
@@ -121,8 +121,7 @@ public class CassandraPersistentEntitySchemaCreator {
 
 		// TODO is this Set really needed?
 		Set<CqlIdentifier> created = new HashSet<>();
-
-		for (CassandraPersistentEntity<?> entity : entities) {
+		entities.forEach(entity -> {
 
 			Set<CqlIdentifier> seen = new LinkedHashSet<>();
 
@@ -136,7 +135,8 @@ public class CassandraPersistentEntitySchemaCreator {
 					.filter(created::add).map(identifier -> mappingContext
 							.getCreateUserTypeSpecificationFor(byTableName.get(identifier)).ifNotExists(ifNotExists))
 					.collect(Collectors.toList()));
-		}
+
+		});
 
 		return specifications;
 	}
@@ -145,7 +145,7 @@ public class CassandraPersistentEntitySchemaCreator {
 
 		entity.getPersistentProperties() //
 				.map(mappingContext::getPersistentEntity) //
-				.flatMap(property -> property.map(Stream::of).orElse(Stream.empty())) //
+				.flatMap(Optionals::toStream) //
 				.filter(CassandraPersistentEntity::isUserDefinedType).forEach(persistentEntity -> {
 					if (seen.add(persistentEntity.getTableName())) {
 						visitUserTypes(persistentEntity, seen);

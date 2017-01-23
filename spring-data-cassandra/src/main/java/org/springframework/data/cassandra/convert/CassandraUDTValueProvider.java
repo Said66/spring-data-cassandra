@@ -35,7 +35,9 @@ import com.datastax.driver.core.UDTValue;
 public class CassandraUDTValueProvider implements CassandraValueProvider {
 
 	private final UDTValue udtValue;
+
 	private final CodecRegistry codecRegistry;
+
 	private final SpELExpressionEvaluator evaluator;
 
 	/**

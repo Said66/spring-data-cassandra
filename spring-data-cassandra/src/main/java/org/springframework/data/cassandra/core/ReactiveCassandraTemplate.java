@@ -58,7 +58,9 @@ import com.datastax.driver.core.querybuilder.Update;
 public class ReactiveCassandraTemplate implements ReactiveCassandraOperations {
 
 	private final CassandraConverter converter;
+
 	private final CassandraMappingContext mappingContext;
+
 	private final ReactiveCqlOperations cqlOperations;
 
 	/**
