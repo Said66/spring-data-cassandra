@@ -38,6 +38,9 @@ public class RowToMapConverter implements Converter<Row, Map<String, Object>> {
 
 	public final static RowToMapConverter INSTANCE = new RowToMapConverter();
 
+	/* (non-Javadoc)
+	 * @see org.springframework.core.convert.converter.Converter#convert(java.lang.Object)
+	 */
 	@Override
 	public Map<String, Object> convert(Row row) {
 

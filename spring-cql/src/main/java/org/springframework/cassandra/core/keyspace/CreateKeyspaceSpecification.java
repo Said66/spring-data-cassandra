@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 the original author or authors.
+ * Copyright 2013-2017 the original author or authors.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 package org.springframework.cassandra.core.keyspace;
 
 import org.springframework.cassandra.config.DataCenterReplication;
-import org.springframework.cassandra.core.cql.CqlIdentifier;
 import org.springframework.cassandra.core.cql.KeyspaceIdentifier;
 import org.springframework.cassandra.core.keyspace.KeyspaceOption.ReplicationStrategy;
 import org.springframework.cassandra.core.util.MapBuilder;
@@ -103,7 +102,7 @@ public class CreateKeyspaceSpecification extends KeyspaceSpecification<CreateKey
 				ReplicationStrategy.NETWORK_TOPOLOGY_STRATEGY.getValue());
 
 		for (DataCenterReplication dcr : dcrs) {
-			builder.entry(new DefaultOption(dcr.dataCenter, Long.class, true, false, false), dcr.replicationFactor);
+			builder.entry(new DefaultOption(dcr.getDataCenter(), Long.class, true, false, false), dcr.getReplicationFactor());
 		}
 
 		return with(KeyspaceOption.REPLICATION, builder.build());

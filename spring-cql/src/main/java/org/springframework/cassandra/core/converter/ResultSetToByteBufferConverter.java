@@ -4,6 +4,9 @@ import java.nio.ByteBuffer;
 
 public class ResultSetToByteBufferConverter extends AbstractResultSetConverter<ByteBuffer> {
 
+	/* (non-Javadoc)
+	 * @see org.springframework.cassandra.core.converter.AbstractResultSetConverter#doConvertSingleValue(java.lang.Object)
+	 */
 	@Override
 	protected ByteBuffer doConvertSingleValue(Object object) {
 
@@ -14,6 +17,9 @@ public class ResultSetToByteBufferConverter extends AbstractResultSetConverter<B
 		return (ByteBuffer) object;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.springframework.cassandra.core.converter.AbstractResultSetConverter#getType()
+	 */
 	@Override
 	protected Class<?> getType() {
 		return ByteBuffer.class;

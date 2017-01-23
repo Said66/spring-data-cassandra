@@ -53,10 +53,10 @@ public enum Ordering implements Comparator<Ordering> {
 		if (l == r) {
 			return 0;
 		}
-		if (l == null && r != null) {
+		if (l == null) {
 			return 1;
 		}
-		if (l != null && r == null) {
+		if (r == null) {
 			return -1;
 		}
 		return (l == ASCENDING && r == DESCENDING) ? 1 : -1;

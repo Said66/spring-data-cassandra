@@ -10,6 +10,9 @@ public class RowToArrayConverter implements Converter<Row, Object[]> {
 
 	protected RowToListConverter delegate = new RowToListConverter();
 
+	/* (non-Javadoc)
+	 * @see org.springframework.core.convert.converter.Converter#convert(java.lang.Object)
+	 */
 	@Override
 	public Object[] convert(Row row) {
 

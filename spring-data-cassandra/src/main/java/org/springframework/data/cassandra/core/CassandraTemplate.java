@@ -15,8 +15,11 @@
  */
 package org.springframework.data.cassandra.core;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -27,7 +30,6 @@ import org.springframework.cassandra.core.QueryOptions;
 import org.springframework.cassandra.core.SessionCallback;
 import org.springframework.cassandra.core.WriteOptions;
 import org.springframework.cassandra.core.cql.CqlIdentifier;
-import org.springframework.cassandra.core.util.CollectionUtils;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.cassandra.convert.CassandraConverter;
 import org.springframework.data.cassandra.convert.MappingCassandraConverter;
@@ -293,7 +295,7 @@ public class CassandraTemplate implements CassandraOperations {
 
 		Select select = QueryBuilder.select().all().from(entity.getTableName().toCql());
 
-		select.where(QueryBuilder.in(idProperty.getColumnName().toCql(), CollectionUtils.toArray(ids)));
+		select.where(QueryBuilder.in(idProperty.getColumnName().toCql(), toList(ids)));
 
 		return select(select, entityClass);
 	}
@@ -439,6 +441,19 @@ public class CassandraTemplate implements CassandraOperations {
 	@Override
 	public CassandraBatchOperations batchOps() {
 		return new CassandraBatchTemplate(this);
+	}
+
+	private <T> List<T> toList(Iterable<T> iterable) {
+
+		if (iterable instanceof List) {
+			return (List<T>) iterable;
+		}
+
+		if (iterable instanceof Collection) {
+			return new ArrayList<>((Collection<T>) iterable);
+		}
+
+		return StreamSupport.stream(iterable.spliterator(), false).collect(Collectors.toList());
 	}
 
 	private static class StatementCallback<T> implements SessionCallback<Optional<T>>, CqlProvider {

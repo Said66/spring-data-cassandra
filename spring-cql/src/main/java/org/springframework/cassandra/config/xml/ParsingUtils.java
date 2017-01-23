@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2016 the original author or authors.
+ * Copyright 2013-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ import org.w3c.dom.Element;
  * Utility class for parsing Cassandra XML namespace configuration meta-data.
  *
  * @author John Blum
+ * @author Mark Paluch
  * @see org.springframework.beans.factory.config.BeanDefinition
  * @see org.springframework.beans.factory.support.BeanDefinitionBuilder
  * @see org.springframework.beans.factory.xml.ParserContext

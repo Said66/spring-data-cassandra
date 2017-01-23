@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 the original author or authors.
+ * Copyright 2013-2017 the original author or authors.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@ import org.springframework.cassandra.core.util.MapBuilder;
  * 
  * @author Alex Shvid
  * @author Matthew T. Adams
+ * @author Mark Paluch
  */
 public class KeyspaceAttributes {
 
@@ -68,7 +69,7 @@ public class KeyspaceAttributes {
 				ReplicationStrategy.NETWORK_TOPOLOGY_STRATEGY.getValue());
 
 		for (DataCenterReplication dcr : dataCenterReplications) {
-			builder.entry(new DefaultOption(dcr.dataCenter, Long.class, true, false, false), dcr.replicationFactor);
+			builder.entry(new DefaultOption(dcr.getDataCenter(), Long.class, true, false, false), dcr.getReplicationFactor());
 		}
 
 		return builder.build();

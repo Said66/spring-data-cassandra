@@ -8,6 +8,9 @@ import org.springframework.util.StringUtils;
 
 public class ResultSetToListOfStringConverter extends AbstractResultSetConverter<List<String>> {
 
+	/* (non-Javadoc)
+	 * @see org.springframework.cassandra.core.converter.AbstractResultSetConverter#doConvertSingleValue(java.lang.Object)
+	 */
 	@Override
 	protected List<String> doConvertSingleValue(Object object) {
 
@@ -17,6 +20,9 @@ public class ResultSetToListOfStringConverter extends AbstractResultSetConverter
 		return list;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.springframework.cassandra.core.converter.AbstractResultSetConverter#doConvertSingleRow(java.util.Map)
+	 */
 	@Override
 	protected List<String> doConvertSingleRow(Map<String, Object> row) {
 

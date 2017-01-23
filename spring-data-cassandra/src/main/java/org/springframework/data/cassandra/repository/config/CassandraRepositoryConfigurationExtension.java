@@ -18,9 +18,9 @@ package org.springframework.data.cassandra.repository.config;
 import java.lang.annotation.Annotation;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Optional;
 
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
-import org.springframework.cassandra.config.xml.ParsingUtils;
 import org.springframework.data.cassandra.config.DefaultBeanNames;
 import org.springframework.data.cassandra.mapping.Table;
 import org.springframework.data.cassandra.repository.CassandraRepository;
@@ -44,44 +44,47 @@ public class CassandraRepositoryConfigurationExtension extends RepositoryConfigu
 
 	private static final String CASSANDRA_TEMPLATE_REF = "cassandra-template-ref";
 
-	/**
-	 * @inheritDoc
+	/* (non-Javadoc)
+	 * @see org.springframework.data.repository.config.RepositoryConfigurationExtensionSupport#getModuleName()
 	 */
 	@Override
 	public String getModuleName() {
-		return "Reactive Cassandra";
+		return "Cassandra";
 	}
 
-	/**
-	 * @inheritDoc
+	/* (non-Javadoc)
+	 * @see org.springframework.data.repository.config.RepositoryConfigurationExtensionSupport#getModulePrefix()
 	 */
 	@Override
 	protected String getModulePrefix() {
 		return "cassandra";
 	}
 
-	/**
-	 * @inheritDoc
+	/* (non-Javadoc)
+	 * @see org.springframework.data.repository.config.RepositoryConfigurationExtension#getRepositoryFactoryClassName()
 	 */
 	@Override
 	public String getRepositoryFactoryClassName() {
 		return CassandraRepositoryFactoryBean.class.getName();
 	}
 
-	/**
-	 * @inheritDoc
+	/* (non-Javadoc)
+	 * @see org.springframework.data.repository.config.RepositoryConfigurationExtensionSupport#postProcess(org.springframework.beans.factory.support.BeanDefinitionBuilder, org.springframework.data.repository.config.XmlRepositoryConfigurationSource)
 	 */
 	@Override
 	public void postProcess(BeanDefinitionBuilder builder, XmlRepositoryConfigurationSource config) {
 
 		Element element = config.getElement();
 
-		ParsingUtils.addOptionalPropertyReference(builder, "cassandraTemplate", element, CASSANDRA_TEMPLATE_REF,
-				DefaultBeanNames.TEMPLATE);
+		String cassandraTemplateRef = Optional.ofNullable(element.getAttribute(CASSANDRA_TEMPLATE_REF)) //
+				.filter(StringUtils::hasText) //
+				.orElse(DefaultBeanNames.TEMPLATE);
+
+		builder.addPropertyReference("cassandraTemplate", cassandraTemplateRef);
 	}
 
-	/**
-	 * @inheritDoc
+	/* (non-Javadoc)
+	 * @see org.springframework.data.repository.config.RepositoryConfigurationExtensionSupport#postProcess(org.springframework.beans.factory.support.BeanDefinitionBuilder, org.springframework.data.repository.config.AnnotationRepositoryConfigurationSource)
 	 */
 	@Override
 	public void postProcess(BeanDefinitionBuilder builder, AnnotationRepositoryConfigurationSource config) {
@@ -93,16 +96,16 @@ public class CassandraRepositoryConfigurationExtension extends RepositoryConfigu
 		}
 	}
 
-	/**
-	 * @inheritDoc
+	/* (non-Javadoc)
+	 * @see org.springframework.data.repository.config.RepositoryConfigurationExtensionSupport#getIdentifyingAnnotations()
 	 */
 	@Override
 	protected Collection<Class<? extends Annotation>> getIdentifyingAnnotations() {
 		return Collections.singleton(Table.class);
 	}
 
-	/**
-	 * @inheritDoc
+	/* (non-Javadoc)
+	 * @see org.springframework.data.repository.config.RepositoryConfigurationExtensionSupport#getIdentifyingTypes()
 	 */
 	@Override
 	protected Collection<Class<?>> getIdentifyingTypes() {

@@ -16,16 +16,8 @@
 package org.springframework.cassandra.support;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.StreamSupport;
-
-import com.datastax.driver.core.ConsistencyLevel;
-import com.datastax.driver.core.PreparedStatement;
-import com.datastax.driver.core.ResultSet;
-import com.datastax.driver.core.Session;
-import com.datastax.driver.core.Statement;
-import com.datastax.driver.core.exceptions.DriverException;
-import com.datastax.driver.core.policies.RetryPolicy;
-import com.datastax.driver.core.querybuilder.QueryBuilder;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,6 +33,15 @@ import org.springframework.cassandra.core.RowMapperResultSetExtractor;
 import org.springframework.cassandra.core.SingleColumnRowMapper;
 import org.springframework.dao.DataAccessException;
 import org.springframework.util.Assert;
+
+import com.datastax.driver.core.ConsistencyLevel;
+import com.datastax.driver.core.PreparedStatement;
+import com.datastax.driver.core.ResultSet;
+import com.datastax.driver.core.Session;
+import com.datastax.driver.core.Statement;
+import com.datastax.driver.core.exceptions.DriverException;
+import com.datastax.driver.core.policies.RetryPolicy;
+import com.datastax.driver.core.querybuilder.QueryBuilder;
 
 /**
  * {@link CassandraAccessor} provides access to a Cassandra {@link Session} and the {@link CassandraExceptionTranslator}
@@ -103,10 +104,9 @@ public class CassandraAccessor implements InitializingBean {
 	}
 
 	/**
-	 * Set the consistency level for this template. Consistency level defines the number of nodes
-	 * involved into query processing. Relaxed consistency level settings use fewer nodes but eventual consistency is more
-	 * likely to occur while a higher consistency level involves more nodes to obtain results with a higher consistency
-	 * guarantee.
+	 * Set the consistency level for this template. Consistency level defines the number of nodes involved into query
+	 * processing. Relaxed consistency level settings use fewer nodes but eventual consistency is more likely to occur
+	 * while a higher consistency level involves more nodes to obtain results with a higher consistency guarantee.
 	 *
 	 * @see Statement#setConsistencyLevel(ConsistencyLevel)
 	 * @see RetryPolicy
@@ -147,10 +147,10 @@ public class CassandraAccessor implements InitializingBean {
 	}
 
 	/**
-	 * Set the fetch size for this template. This is important for processing large result sets: Setting this
-	 * higher than the default value will increase processing speed at the cost of memory consumption; setting this lower
-	 * can avoid transferring row data that will never be read by the application. Default is -1, indicating to use the
-	 * CQL driver's default configuration (i.e. to not pass a specific fetch size setting on to the driver).
+	 * Set the fetch size for this template. This is important for processing large result sets: Setting this higher than
+	 * the default value will increase processing speed at the cost of memory consumption; setting this lower can avoid
+	 * transferring row data that will never be read by the application. Default is -1, indicating to use the CQL driver's
+	 * default configuration (i.e. to not pass a specific fetch size setting on to the driver).
 	 *
 	 * @see Statement#setFetchSize(int)
 	 */
@@ -166,8 +166,7 @@ public class CassandraAccessor implements InitializingBean {
 	}
 
 	/**
-	 * Set the retry policy for this template. This is important for defining behavior when a request
-	 * fails.
+	 * Set the retry policy for this template. This is important for defining behavior when a request fails.
 	 *
 	 * @see Statement#setRetryPolicy(RetryPolicy)
 	 * @see RetryPolicy
@@ -274,8 +273,8 @@ public class CassandraAccessor implements InitializingBean {
 	}
 
 	/**
-	 * Constructs a new instance of the {@link ResultSetExtractor} initialized with and adapting
-	 * the given {@link RowCallbackHandler}.
+	 * Constructs a new instance of the {@link ResultSetExtractor} initialized with and adapting the given
+	 * {@link RowCallbackHandler}.
 	 *
 	 * @param rowCallbackHandler {@link RowCallbackHandler} to adapt as a {@link ResultSetExtractor}.
 	 * @return a {@link ResultSetExtractor} implementation adapting an instance of the {@link RowCallbackHandler}.
@@ -288,8 +287,8 @@ public class CassandraAccessor implements InitializingBean {
 	}
 
 	/**
-	 * Constructs a new instance of the {@link ResultSetExtractor} initialized with and adapting
-	 * the given {@link RowMapper}.
+	 * Constructs a new instance of the {@link ResultSetExtractor} initialized with and adapting the given
+	 * {@link RowMapper}.
 	 *
 	 * @param rowMapper {@link RowMapper} to adapt as a {@link ResultSetExtractor}.
 	 * @return a {@link ResultSetExtractor} implementation adapting an instance of the {@link RowMapper}.
@@ -302,8 +301,8 @@ public class CassandraAccessor implements InitializingBean {
 	}
 
 	/**
-	 * Constructs a new instance of the {@link ResultSetExtractor} initialized with and adapting
-	 * the given {@link RowMapper}.
+	 * Constructs a new instance of the {@link ResultSetExtractor} initialized with and adapting the given
+	 * {@link RowMapper}.
 	 *
 	 * @param rowMapper {@link RowMapper} to adapt as a {@link ResultSetExtractor}.
 	 * @param rowsExpected number of expected rows in the {@link ResultSet}.
@@ -345,7 +344,11 @@ public class CassandraAccessor implements InitializingBean {
 	 * @see CqlProvider
 	 */
 	protected static String toCql(Object cqlProvider) {
-		return (cqlProvider instanceof CqlProvider ? ((CqlProvider) cqlProvider).getCql() : null);
+		return Optional.ofNullable(cqlProvider) //
+				.filter(o -> o instanceof CqlProvider) //
+				.map(o -> (CqlProvider) o) //
+				.map(CqlProvider::getCql) //
+				.orElse(null);
 	}
 
 	/**
@@ -406,7 +409,9 @@ public class CassandraAccessor implements InitializingBean {
 		}
 
 		/**
-		 * @inheritDoc
+		 * (non-Javadoc)
+		 * 
+		 * @see org.springframework.cassandra.core.ResultSetExtractor#extractData
 		 */
 		@Override
 		public Object extractData(ResultSet resultSet) {

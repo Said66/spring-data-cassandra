@@ -16,42 +16,13 @@
 package org.springframework.cassandra.support;
 
 import org.springframework.cassandra.core.support.CQLExceptionTranslator;
-import org.springframework.cassandra.support.exception.CassandraAuthenticationException;
-import org.springframework.cassandra.support.exception.CassandraConnectionFailureException;
-import org.springframework.cassandra.support.exception.CassandraInsufficientReplicasAvailableException;
-import org.springframework.cassandra.support.exception.CassandraInternalException;
-import org.springframework.cassandra.support.exception.CassandraInvalidConfigurationInQueryException;
-import org.springframework.cassandra.support.exception.CassandraInvalidQueryException;
-import org.springframework.cassandra.support.exception.CassandraKeyspaceExistsException;
-import org.springframework.cassandra.support.exception.CassandraQuerySyntaxException;
-import org.springframework.cassandra.support.exception.CassandraReadTimeoutException;
-import org.springframework.cassandra.support.exception.CassandraTableExistsException;
-import org.springframework.cassandra.support.exception.CassandraTraceRetrievalException;
-import org.springframework.cassandra.support.exception.CassandraTruncateException;
-import org.springframework.cassandra.support.exception.CassandraTypeMismatchException;
-import org.springframework.cassandra.support.exception.CassandraUnauthorizedException;
-import org.springframework.cassandra.support.exception.CassandraUncategorizedException;
-import org.springframework.cassandra.support.exception.CassandraWriteTimeoutException;
+import org.springframework.cassandra.support.exception.*;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.support.PersistenceExceptionTranslator;
 import org.springframework.util.StringUtils;
 
 import com.datastax.driver.core.WriteType;
-import com.datastax.driver.core.exceptions.AlreadyExistsException;
-import com.datastax.driver.core.exceptions.AuthenticationException;
-import com.datastax.driver.core.exceptions.DriverException;
-import com.datastax.driver.core.exceptions.DriverInternalError;
-import com.datastax.driver.core.exceptions.InvalidConfigurationInQueryException;
-import com.datastax.driver.core.exceptions.InvalidQueryException;
-import com.datastax.driver.core.exceptions.InvalidTypeException;
-import com.datastax.driver.core.exceptions.NoHostAvailableException;
-import com.datastax.driver.core.exceptions.ReadTimeoutException;
-import com.datastax.driver.core.exceptions.SyntaxError;
-import com.datastax.driver.core.exceptions.TraceRetrievalException;
-import com.datastax.driver.core.exceptions.TruncateException;
-import com.datastax.driver.core.exceptions.UnauthorizedException;
-import com.datastax.driver.core.exceptions.UnavailableException;
-import com.datastax.driver.core.exceptions.WriteTimeoutException;
+import com.datastax.driver.core.exceptions.*;
 
 /**
  * Simple {@link PersistenceExceptionTranslator} for Cassandra.
@@ -66,6 +37,9 @@ import com.datastax.driver.core.exceptions.WriteTimeoutException;
  */
 public class CassandraExceptionTranslator implements CQLExceptionTranslator {
 
+	/* (non-Javadoc)
+	 * @see org.springframework.dao.support.PersistenceExceptionTranslator#translateExceptionIfPossible(java.lang.RuntimeException)
+	 */
 	@Override
 	public DataAccessException translateExceptionIfPossible(RuntimeException ex) {
 
@@ -80,6 +54,9 @@ public class CassandraExceptionTranslator implements CQLExceptionTranslator {
 		return translate(null, null, (DriverException) ex);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.springframework.cassandra.core.support.CQLExceptionTranslator#translate(java.lang.String, java.lang.String, com.datastax.driver.core.exceptions.DriverException)
+	 */
 	@Override
 	public DataAccessException translate(String task, String cql, DriverException ex) {
 

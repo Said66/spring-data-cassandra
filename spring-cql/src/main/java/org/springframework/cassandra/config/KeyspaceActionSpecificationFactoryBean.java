@@ -41,8 +41,8 @@ import org.springframework.util.Assert;
  * 
  * @author David Webb
  */
-public class KeyspaceActionSpecificationFactoryBean implements FactoryBean<Set<KeyspaceActionSpecification<?>>>,
-		InitializingBean, DisposableBean {
+public class KeyspaceActionSpecificationFactoryBean
+		implements FactoryBean<Set<KeyspaceActionSpecification<?>>>, InitializingBean, DisposableBean {
 
 	private KeyspaceAction action;
 	private String name;
@@ -55,8 +55,12 @@ public class KeyspaceActionSpecificationFactoryBean implements FactoryBean<Set<K
 
 	private Set<KeyspaceActionSpecification<?>> specs = new HashSet<KeyspaceActionSpecification<?>>();
 
+	/* (non-Javadoc)
+	 * @see org.springframework.beans.factory.DisposableBean#destroy()
+	 */
 	@Override
-	public void destroy() throws Exception {
+	public void destroy() {
+
 		action = null;
 		name = null;
 		networkTopologyDataCenters = null;
@@ -65,8 +69,11 @@ public class KeyspaceActionSpecificationFactoryBean implements FactoryBean<Set<K
 		specs = null;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
+	 */
 	@Override
-	public void afterPropertiesSet() throws Exception {
+	public void afterPropertiesSet() {
 
 		Assert.hasText(name, "Keyspace Name is required for a Keyspace Action");
 		Assert.notNull(action, "Keyspace Action is required for a Keyspace Action");
@@ -81,7 +88,6 @@ public class KeyspaceActionSpecificationFactoryBean implements FactoryBean<Set<K
 			case ALTER:
 				break;
 		}
-
 	}
 
 	/**
@@ -127,16 +133,25 @@ public class KeyspaceActionSpecificationFactoryBean implements FactoryBean<Set<K
 		return drop;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.springframework.beans.factory.FactoryBean#getObject()
+	 */
 	@Override
 	public Set<KeyspaceActionSpecification<?>> getObject() throws Exception {
 		return specs;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.springframework.beans.factory.FactoryBean#getObjectType()
+	 */
 	@Override
 	public Class<?> getObjectType() {
 		return Set.class;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.springframework.beans.factory.FactoryBean#isSingleton()
+	 */
 	@Override
 	public boolean isSingleton() {
 		return false;

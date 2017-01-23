@@ -52,20 +52,25 @@ import com.datastax.driver.core.SocketOptions;
  */
 public class CassandraCqlClusterParser extends AbstractBeanDefinitionParser {
 
+	/* (non-Javadoc)
+	 * @see org.springframework.beans.factory.xml.AbstractBeanDefinitionParser#resolveId(org.w3c.dom.Element, org.springframework.beans.factory.support.AbstractBeanDefinition, org.springframework.beans.factory.xml.ParserContext)
+	 */
 	@Override
 	protected String resolveId(Element element, AbstractBeanDefinition definition, ParserContext parserContext)
 			throws BeanDefinitionStoreException {
 
 		String id = super.resolveId(element, definition, parserContext);
 
-		return (StringUtils.hasText(id) ? id : DefaultCqlBeanNames.CLUSTER);
+		return StringUtils.hasText(id) ? id : DefaultCqlBeanNames.CLUSTER;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.springframework.beans.factory.xml.AbstractBeanDefinitionParser#parseInternal(org.w3c.dom.Element, org.springframework.beans.factory.xml.ParserContext)
+	 */
 	@Override
 	protected AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext) {
 
-		BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition(
-			CassandraCqlClusterFactoryBean.class);
+		BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition(CassandraCqlClusterFactoryBean.class);
 
 		builder.setLazyInit(parserContext.isDefaultLazyInit());
 		builder.getRawBeanDefinition().setDestroyMethodName("destroy");
@@ -131,11 +136,11 @@ public class CassandraCqlClusterParser extends AbstractBeanDefinitionParser {
 		List<String> startupScripts = new ArrayList<String>();
 		List<String> shutdownScripts = new ArrayList<String>();
 
-		BeanDefinitionBuilder poolingOptionsBuilder = BeanDefinitionBuilder.genericBeanDefinition(
-			PoolingOptionsFactoryBean.class);
+		BeanDefinitionBuilder poolingOptionsBuilder = BeanDefinitionBuilder
+				.genericBeanDefinition(PoolingOptionsFactoryBean.class);
 
-		addOptionalPropertyReference(poolingOptionsBuilder, "initializationExecutor",
-			element, "initialization-executor-ref");
+		addOptionalPropertyReference(poolingOptionsBuilder, "initializationExecutor", element,
+				"initialization-executor-ref");
 
 		addOptionalPropertyValue(poolingOptionsBuilder, "heartbeatIntervalSeconds", element, "heartbeat-interval-seconds");
 		addOptionalPropertyValue(poolingOptionsBuilder, "idleTimeoutSeconds", element, "idle-timeout-seconds");
@@ -148,8 +153,8 @@ public class CassandraCqlClusterParser extends AbstractBeanDefinitionParser {
 			String name = subElement.getLocalName();
 
 			if ("keyspace".equals(name)) {
-				keyspaceActionSpecificationBeanDefinitions.add(
-					newKeyspaceActionSpecificationBeanDefinition(subElement, parserContext));
+				keyspaceActionSpecificationBeanDefinitions
+						.add(newKeyspaceActionSpecificationBeanDefinition(subElement, parserContext));
 			} else if ("local-pooling-options".equals(name)) {
 				parseLocalPoolingOptions(subElement, poolingOptionsBuilder);
 			} else if ("remote-pooling-options".equals(name)) {
@@ -163,11 +168,10 @@ public class CassandraCqlClusterParser extends AbstractBeanDefinitionParser {
 			}
 		}
 
-		builder.addPropertyValue("keyspaceSpecifications", newKeyspaceSetFlattenerBeanDefinition(
-			element, parserContext, keyspaceActionSpecificationBeanDefinitions));
+		builder.addPropertyValue("keyspaceSpecifications",
+				newKeyspaceSetFlattenerBeanDefinition(element, parserContext, keyspaceActionSpecificationBeanDefinitions));
 
-		builder.addPropertyValue("poolingOptions", getSourceBeanDefinition(
-			poolingOptionsBuilder, parserContext, element));
+		builder.addPropertyValue("poolingOptions", getSourceBeanDefinition(poolingOptionsBuilder, parserContext, element));
 
 		builder.addPropertyValue("startupScripts", startupScripts);
 		builder.addPropertyValue("shutdownScripts", shutdownScripts);
@@ -180,17 +184,16 @@ public class CassandraCqlClusterParser extends AbstractBeanDefinitionParser {
 	 * @param parserContext XML parser context and state.
 	 * @return the {@link BeanDefinition} or {@literal null} if action is not given.
 	 */
-	BeanDefinition newKeyspaceActionSpecificationBeanDefinition(Element element, ParserContext parserContext) {
+	private BeanDefinition newKeyspaceActionSpecificationBeanDefinition(Element element, ParserContext parserContext) {
 
-		BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition(
-			KeyspaceActionSpecificationFactoryBean.class);
+		BeanDefinitionBuilder builder = BeanDefinitionBuilder
+				.genericBeanDefinition(KeyspaceActionSpecificationFactoryBean.class);
 
 		// add required replication defaults
-		addRequiredPropertyValue(builder, "replicationStrategy",
-			KeyspaceAttributes.DEFAULT_REPLICATION_STRATEGY.name());
+		addRequiredPropertyValue(builder, "replicationStrategy", KeyspaceAttributes.DEFAULT_REPLICATION_STRATEGY.name());
 
 		addRequiredPropertyValue(builder, "replicationFactor",
-			String.valueOf(KeyspaceAttributes.DEFAULT_REPLICATION_FACTOR));
+				String.valueOf(KeyspaceAttributes.DEFAULT_REPLICATION_FACTOR));
 
 		addRequiredPropertyValue(builder, "name", element, "name");
 		addOptionalPropertyValue(builder, "durableWrites", element, "durable-writes", "false");
@@ -207,17 +210,17 @@ public class CassandraCqlClusterParser extends AbstractBeanDefinitionParser {
 	 * @param element {@link Element} to parse.
 	 * @param builder The {@link BeanDefinitionBuilder} to add the replication to
 	 */
-	void parseReplication(Element element, BeanDefinitionBuilder builder) {
+	private void parseReplication(Element element, BeanDefinitionBuilder builder) {
 
 		ManagedList<String> networkTopologyDataCenters = new ManagedList<String>();
 		ManagedList<String> networkTopologyReplicationFactors = new ManagedList<String>();
 
 		if (element != null) {
 			addOptionalPropertyValue(builder, "replicationStrategy", element, "class",
-				KeyspaceAttributes.DEFAULT_REPLICATION_STRATEGY.name());
+					KeyspaceAttributes.DEFAULT_REPLICATION_STRATEGY.name());
 
 			addOptionalPropertyValue(builder, "replicationFactor", element, "replication-factor",
-				String.valueOf(KeyspaceAttributes.DEFAULT_REPLICATION_FACTOR));
+					String.valueOf(KeyspaceAttributes.DEFAULT_REPLICATION_FACTOR));
 
 			// DataCenters only apply to NetworkTopologyStrategy
 			for (Element dataCenter : DomUtils.getChildElementsByTagName(element, "data-center")) {
@@ -238,12 +241,13 @@ public class CassandraCqlClusterParser extends AbstractBeanDefinitionParser {
 	 * @param keyspaceActionSpecificationBeanDefinitions The List of Definitions to flatten
 	 * @return A single level List of KeyspaceActionSpecifications
 	 */
-	Object newKeyspaceSetFlattenerBeanDefinition(Element element, ParserContext parserContext,
+	private Object newKeyspaceSetFlattenerBeanDefinition(Element element, ParserContext parserContext,
 			ManagedSet<BeanDefinition> keyspaceActionSpecificationBeanDefinitions) {
 
-		BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition(
-			MultiLevelSetFlattenerFactoryBean.class);
+		BeanDefinitionBuilder builder = BeanDefinitionBuilder
+				.genericBeanDefinition(MultiLevelSetFlattenerFactoryBean.class);
 
+		// TODO: introduce a typed reference instead of Set of Sets.
 		builder.addPropertyValue("multiLevelSet", keyspaceActionSpecificationBeanDefinitions);
 
 		return getSourceBeanDefinition(builder, parserContext, element);

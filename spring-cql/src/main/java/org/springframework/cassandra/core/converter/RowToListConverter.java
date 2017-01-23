@@ -38,6 +38,9 @@ public class RowToListConverter implements Converter<Row, List<Object>> {
 
 	public final static RowToListConverter INSTANCE = new RowToListConverter();
 
+	/* (non-Javadoc)
+	 * @see org.springframework.core.convert.converter.Converter#convert(java.lang.Object)
+	 */
 	@Override
 	public List<Object> convert(Row row) {
 

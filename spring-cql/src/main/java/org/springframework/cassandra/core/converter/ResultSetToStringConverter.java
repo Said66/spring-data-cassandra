@@ -5,11 +5,17 @@ import java.util.Map;
 
 public class ResultSetToStringConverter extends AbstractResultSetConverter<String> {
 
+	/* (non-Javadoc)
+	 * @see org.springframework.cassandra.core.converter.AbstractResultSetConverter#doConvertSingleValue(java.lang.Object)
+	 */
 	@Override
 	protected String doConvertSingleValue(Object object) {
 		return object == null ? null : object.toString();
 	}
 
+	/* (non-Javadoc)
+	 * @see org.springframework.cassandra.core.converter.AbstractResultSetConverter#doConvertSingleRow(java.util.Map)
+	 */
 	@Override
 	protected String doConvertSingleRow(Map<String, Object> row) {
 

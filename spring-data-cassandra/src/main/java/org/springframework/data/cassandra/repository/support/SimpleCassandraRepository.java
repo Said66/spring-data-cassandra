@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.cassandra.core.util.CollectionUtils;
 import org.springframework.data.cassandra.core.CassandraOperations;
 import org.springframework.data.cassandra.core.CassandraTemplate;
 import org.springframework.data.cassandra.repository.TypedIdCassandraRepository;
@@ -101,7 +100,7 @@ public class SimpleCassandraRepository<T, ID extends Serializable> implements Ty
 
 	@Override
 	public void delete(Iterable<? extends T> entities) {
-		operations.delete(CollectionUtils.toList(entities));
+		entities.forEach(operations::delete);
 	}
 
 	@Override

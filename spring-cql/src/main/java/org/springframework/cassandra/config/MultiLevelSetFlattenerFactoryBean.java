@@ -26,7 +26,7 @@ import org.springframework.beans.factory.FactoryBean;
  * Given Set of Sets where all child Sets contain the same class, then a single level Set of <T> is generated.
  * 
  * @author David Webb
- * @param <T>
+ * @param <T> TODO: Remove me
  */
 public class MultiLevelSetFlattenerFactoryBean<T> implements FactoryBean<Set<T>> {
 

@@ -47,6 +47,9 @@ public class SimplePreparedStatementCreator implements PreparedStatementCreator 
 		return this.cql;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.springframework.cassandra.core.PreparedStatementCreator#createPreparedStatement(com.datastax.driver.core.Session)
+	 */
 	@Override
 	public PreparedStatement createPreparedStatement(Session session) throws DriverException {
 		return session.prepare(this.cql);
