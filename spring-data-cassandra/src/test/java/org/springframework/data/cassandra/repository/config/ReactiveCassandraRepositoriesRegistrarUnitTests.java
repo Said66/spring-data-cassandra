@@ -60,5 +60,5 @@ public class ReactiveCassandraRepositoriesRegistrarUnitTests {
 	@Test // DATACASS-335
 	public void testConfiguration() {}
 
-	static interface ReactivePersonRepository extends ReactiveCassandraRepository<Person, String> {}
+	interface ReactivePersonRepository extends ReactiveCassandraRepository<Person, String> {}
 }

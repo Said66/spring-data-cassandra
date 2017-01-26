@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2016 the original author or authors.
+ * Copyright 2013-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -131,10 +131,10 @@ public class CassandraCqlClusterParser extends AbstractBeanDefinitionParser {
 	 */
 	protected void parseChildElements(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
 
-		ManagedSet<BeanDefinition> keyspaceActionSpecificationBeanDefinitions = new ManagedSet<BeanDefinition>();
+		ManagedSet<BeanDefinition> keyspaceActionSpecificationBeanDefinitions = new ManagedSet<>();
 
-		List<String> startupScripts = new ArrayList<String>();
-		List<String> shutdownScripts = new ArrayList<String>();
+		List<String> startupScripts = new ArrayList<>();
+		List<String> shutdownScripts = new ArrayList<>();
 
 		BeanDefinitionBuilder poolingOptionsBuilder = BeanDefinitionBuilder
 				.genericBeanDefinition(PoolingOptionsFactoryBean.class);
@@ -212,8 +212,8 @@ public class CassandraCqlClusterParser extends AbstractBeanDefinitionParser {
 	 */
 	private void parseReplication(Element element, BeanDefinitionBuilder builder) {
 
-		ManagedList<String> networkTopologyDataCenters = new ManagedList<String>();
-		ManagedList<String> networkTopologyReplicationFactors = new ManagedList<String>();
+		ManagedList<String> networkTopologyDataCenters = new ManagedList<>();
+		ManagedList<String> networkTopologyReplicationFactors = new ManagedList<>();
 
 		if (element != null) {
 			addOptionalPropertyValue(builder, "replicationStrategy", element, "class",

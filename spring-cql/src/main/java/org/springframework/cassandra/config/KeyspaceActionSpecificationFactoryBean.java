@@ -1,12 +1,12 @@
 /*
- * Copyright 2013-2014 the original author or authors.
- * 
+ * Copyright 2013-2017 the original author or authors.
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -38,7 +38,7 @@ import org.springframework.util.Assert;
  * A single keyspace XML Element can result in multiple actions. Example: {@literal CREATE_DROP}. This FactoryBean
  * inspects the action required to satisfy the keyspace element, and then returns a Set of atomic
  * {@link KeyspaceActionSpecification} required to satisfy the configuration action.
- * 
+ *
  * @author David Webb
  */
 public class KeyspaceActionSpecificationFactoryBean
@@ -46,14 +46,14 @@ public class KeyspaceActionSpecificationFactoryBean
 
 	private KeyspaceAction action;
 	private String name;
-	private List<String> networkTopologyDataCenters = new LinkedList<String>();
-	private List<String> networkTopologyReplicationFactors = new LinkedList<String>();
+	private List<String> networkTopologyDataCenters = new LinkedList<>();
+	private List<String> networkTopologyReplicationFactors = new LinkedList<>();
 	private ReplicationStrategy replicationStrategy;
 	private long replicationFactor;
 	private boolean durableWrites = false;
 	private boolean ifNotExists = false;
 
-	private Set<KeyspaceActionSpecification<?>> specs = new HashSet<KeyspaceActionSpecification<?>>();
+	private Set<KeyspaceActionSpecification<?>> specs = new HashSet<>();
 
 	/* (non-Javadoc)
 	 * @see org.springframework.beans.factory.DisposableBean#destroy()
@@ -92,7 +92,7 @@ public class KeyspaceActionSpecificationFactoryBean
 
 	/**
 	 * Generate a {@link CreateKeyspaceSpecification} for the keyspace.
-	 * 
+	 *
 	 * @return The {@link CreateKeyspaceSpecification}
 	 */
 	private CreateKeyspaceSpecification generateCreateKeyspaceSpecification() {
@@ -100,7 +100,7 @@ public class KeyspaceActionSpecificationFactoryBean
 		CreateKeyspaceSpecification create = new CreateKeyspaceSpecification();
 		create.name(name).ifNotExists(ifNotExists).with(KeyspaceOption.DURABLE_WRITES, durableWrites);
 
-		Map<Option, Object> replicationStrategyMap = new HashMap<Option, Object>();
+		Map<Option, Object> replicationStrategyMap = new HashMap<>();
 		replicationStrategyMap.put(new DefaultOption("class", String.class, true, false, true),
 				replicationStrategy.getValue());
 
@@ -124,7 +124,7 @@ public class KeyspaceActionSpecificationFactoryBean
 
 	/**
 	 * Generate a {@link DropKeyspaceSpecification} for the keyspace.
-	 * 
+	 *
 	 * @return The {@link DropKeyspaceSpecification}
 	 */
 	private DropKeyspaceSpecification generateDropKeyspaceSpecification() {

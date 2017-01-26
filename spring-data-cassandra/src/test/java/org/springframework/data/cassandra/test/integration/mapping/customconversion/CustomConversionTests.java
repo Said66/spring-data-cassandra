@@ -49,7 +49,7 @@ import com.datastax.driver.core.querybuilder.QueryBuilder;
 /**
  * Test suite for applying {@link CustomConversions} to
  * {@link org.springframework.data.cassandra.mapping.BasicCassandraMappingContext}.
- * 
+ *
  * @author Mark Paluch
  */
 public class CustomConversionTests extends AbstractKeyspaceCreatingIntegrationTest {
@@ -59,7 +59,7 @@ public class CustomConversionTests extends AbstractKeyspaceCreatingIntegrationTe
 	@Before
 	public void setUp() {
 
-		List<Converter<?, ?>> converters = new ArrayList<Converter<?, ?>>();
+		List<Converter<?, ?>> converters = new ArrayList<>();
 		converters.add(new PersonReadConverter());
 		converters.add(new PersonWriteConverter());
 		CustomConversions customConversions = new CustomConversions(converters);

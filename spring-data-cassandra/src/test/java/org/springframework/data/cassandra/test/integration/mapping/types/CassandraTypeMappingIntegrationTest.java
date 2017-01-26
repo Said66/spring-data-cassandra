@@ -334,7 +334,7 @@ public class CassandraTypeMappingIntegrationTest extends AbstractKeyspaceCreatin
 	public void shouldReadAndWriteEmptySetOfString() {
 
 		AllPossibleTypes entity = new AllPossibleTypes("1");
-		entity.setSetOfString(new HashSet<String>());
+		entity.setSetOfString(new HashSet<>());
 
 		operations.insert(entity);
 		AllPossibleTypes loaded = load(entity);
@@ -358,7 +358,7 @@ public class CassandraTypeMappingIntegrationTest extends AbstractKeyspaceCreatin
 	public void shouldReadAndWriteEmptyListOfString() {
 
 		AllPossibleTypes entity = new AllPossibleTypes("1");
-		entity.setListOfString(new ArrayList<String>());
+		entity.setListOfString(new ArrayList<>());
 
 		operations.insert(entity);
 		AllPossibleTypes loaded = load(entity);
@@ -382,7 +382,7 @@ public class CassandraTypeMappingIntegrationTest extends AbstractKeyspaceCreatin
 	public void shouldReadAndWriteEmptyMapOfString() {
 
 		AllPossibleTypes entity = new AllPossibleTypes("1");
-		entity.setMapOfString(new HashMap<String, String>());
+		entity.setMapOfString(new HashMap<>());
 
 		operations.insert(entity);
 		AllPossibleTypes loaded = load(entity);
@@ -592,6 +592,6 @@ public class CassandraTypeMappingIntegrationTest extends AbstractKeyspaceCreatin
 	}
 
 	public enum Condition {
-		MINT;
+		MINT
 	}
 }

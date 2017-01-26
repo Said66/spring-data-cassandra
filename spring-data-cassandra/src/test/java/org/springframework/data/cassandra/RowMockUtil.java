@@ -19,6 +19,8 @@ import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
 
+import java.util.Arrays;
+
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.springframework.util.Assert;
@@ -29,7 +31,7 @@ import com.datastax.driver.core.Row;
 
 /**
  * Utility to mock a Cassandra {@link Row}.
- * 
+ *
  * @author Mark Paluch
  */
 public class RowMockUtil {
@@ -37,7 +39,7 @@ public class RowMockUtil {
 	/**
 	 * Creates a new {@link Row} mock using the given {@code columns}. Each column carries a name, value and data type so
 	 * users of {@link Row} can use most of the methods.
-	 * 
+	 *
 	 * @param columns
 	 * @return
 	 */
@@ -53,14 +55,8 @@ public class RowMockUtil {
 		when(columnDefinitionsMock.contains(anyString())).thenAnswer(new Answer<Boolean>() {
 			@Override
 			public Boolean answer(InvocationOnMock invocation) throws Throwable {
-
-				for (Column column : columns) {
-					if (column.name.equalsIgnoreCase((String) invocation.getArguments()[0])) {
-						return true;
-					}
-				}
-
-				return false;
+				return Arrays.stream(columns)
+						.anyMatch(column -> column.name.equalsIgnoreCase((String) invocation.getArguments()[0]));
 			}
 		});
 
@@ -84,13 +80,9 @@ public class RowMockUtil {
 			@Override
 			public DataType answer(InvocationOnMock invocation) throws Throwable {
 
-				for (Column column : columns) {
-					if (column.name.equalsIgnoreCase((String) invocation.getArguments()[0])) {
-						return column.type;
-					}
-				}
-
-				return null;
+				return Arrays.stream(columns)
+						.filter(column -> column.name.equalsIgnoreCase((String) invocation.getArguments()[0])).findFirst()
+						.map(column -> column.type).orElse(null);
 			}
 		});
 
@@ -111,14 +103,9 @@ public class RowMockUtil {
 		when(rowMock.getObject(anyString())).thenAnswer(new Answer<Object>() {
 			@Override
 			public Object answer(InvocationOnMock invocation) throws Throwable {
-
-				for (Column column : columns) {
-					if (column.name.equalsIgnoreCase((String) invocation.getArguments()[0])) {
-						return column.value;
-					}
-				}
-
-				return null;
+				return Arrays.stream(columns)
+						.filter(column -> column.name.equalsIgnoreCase((String) invocation.getArguments()[0])).findFirst()
+						.map(column -> column.value).orElse(null);
 			}
 		});
 
@@ -127,7 +114,7 @@ public class RowMockUtil {
 
 	/**
 	 * Creates a new {@link Column} to be used with {@link RowMockUtil#newRowMock(Column...)}.
-	 * 
+	 *
 	 * @param name must not be empty or {@link null}.
 	 * @param value can be {@literal null}.
 	 * @param type must not be {@literal null}.

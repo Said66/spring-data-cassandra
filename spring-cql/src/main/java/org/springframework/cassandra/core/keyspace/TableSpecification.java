@@ -1,12 +1,12 @@
 /*
  * Copyright 2013-2017 the original author or authors.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -33,7 +33,7 @@ import com.datastax.driver.core.DataType;
 /**
  * Builder class to support the construction of table specifications that have columns. This class can also be used as a
  * standalone {@link TableDescriptor}, independent of {@link CreateTableSpecification}.
- * 
+ *
  * @author Matthew T. Adams
  * @author Alex Shvid
  * @author Mark Paluch
@@ -43,26 +43,26 @@ public class TableSpecification<T> extends TableOptionsSpecification<TableSpecif
 	/**
 	 * List of all columns.
 	 */
-	private List<ColumnSpecification> columns = new ArrayList<ColumnSpecification>();
+	private List<ColumnSpecification> columns = new ArrayList<>();
 
 	/**
 	 * List of only those columns that comprise the partition key.
 	 */
-	private List<ColumnSpecification> partitionKeyColumns = new ArrayList<ColumnSpecification>();
+	private List<ColumnSpecification> partitionKeyColumns = new ArrayList<>();
 
 	/**
 	 * List of only those columns that comprise the primary key that are not also part of the partition key.
 	 */
-	private List<ColumnSpecification> clusteredKeyColumns = new ArrayList<ColumnSpecification>();
+	private List<ColumnSpecification> clusteredKeyColumns = new ArrayList<>();
 
 	/**
 	 * List of only those columns that are not partition or primary key columns.
 	 */
-	private List<ColumnSpecification> nonKeyColumns = new ArrayList<ColumnSpecification>();
+	private List<ColumnSpecification> nonKeyColumns = new ArrayList<>();
 
 	/**
 	 * Adds the given non-key column to the table. Must be specified after all primary key columns.
-	 * 
+	 *
 	 * @param name The column name; must be a valid unquoted or quoted identifier without the surrounding double quotes,
 	 *          must not be {@literal null}.
 	 * @param type The data type of the column, must not be {@literal null}.
@@ -84,7 +84,7 @@ public class TableSpecification<T> extends TableOptionsSpecification<TableSpecif
 
 	/**
 	 * Adds the given partition key column to the table. Must be specified before any other columns.
-	 * 
+	 *
 	 * @param name The column name; must be a valid unquoted or quoted identifier without the surrounding double quotes,
 	 *          must not be {@literal null}.
 	 * @param type The data type of the column, must not be {@literal null}.
@@ -109,7 +109,7 @@ public class TableSpecification<T> extends TableOptionsSpecification<TableSpecif
 	/**
 	 * Adds the given primary key column to the table with ascending ordering. Must be specified after all partition key
 	 * columns and before any non-key columns.
-	 * 
+	 *
 	 * @param name The column name; must be a valid unquoted or quoted identifier without the surrounding double quotes,
 	 *          must not be {@literal null}.
 	 * @param type The data type of the column, must not be {@literal null}.
@@ -165,7 +165,7 @@ public class TableSpecification<T> extends TableOptionsSpecification<TableSpecif
 	/**
 	 * Adds the given info as a new column to the table. Partition key columns must precede primary key columns, which
 	 * must precede non-key columns.
-	 * 
+	 *
 	 * @param name The column name; must be a valid unquoted or quoted identifier without the surrounding double quotes,
 	 *          must not be {@literal null}.
 	 * @param type The data type of the column, must not be {@literal null}.
@@ -280,7 +280,7 @@ public class TableSpecification<T> extends TableOptionsSpecification<TableSpecif
 	@Override
 	public List<ColumnSpecification> getPrimaryKeyColumns() {
 
-		ArrayList<ColumnSpecification> primaryKeyColumns = new ArrayList<ColumnSpecification>();
+		ArrayList<ColumnSpecification> primaryKeyColumns = new ArrayList<>();
 		primaryKeyColumns.addAll(partitionKeyColumns);
 		primaryKeyColumns.addAll(clusteredKeyColumns);
 

@@ -1,12 +1,12 @@
 /*
- * Copyright 2013-2014 the original author or authors.
- * 
+ * Copyright 2013-2017 the original author or authors.
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
- * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,7 +21,7 @@ import java.util.Map;
  * Enumeration that represents all known table options. If a table option is not listed here, but is supported by
  * Cassandra, use the method {@link CreateTableSpecification#with(String, Object, boolean, boolean)} to write the raw
  * value. Implements {@link Option} via delegation, since {@link Enum}s can't extend anything.
- * 
+ *
  * @author Matthew T. Adams
  * @see CompactionOption
  * @see CompressionOption
@@ -38,19 +38,19 @@ public enum TableOption implements Option {
 	COMPACT_STORAGE("COMPACT STORAGE", null, false, false, false),
 	/**
 	 * <code>compaction</code>. Value is a <code>Map&lt;CompactionOption,Object&gt;</code>.
-	 * 
+	 *
 	 * @see CompactionOption
 	 */
 	COMPACTION("compaction", Map.class, true, false, false),
 	/**
 	 * <code>compression</code>. Value is a <code>Map&lt;CompressionOption,Object&gt;</code>.
-	 * 
+	 *
 	 * @see {@link CompressionOption}
 	 */
 	COMPRESSION("compression", Map.class, true, false, false),
 	/**
 	 * <code>caching</code>
-	 * 
+	 *
 	 * @see CachingOption
 	 */
 	CACHING("caching", Map.class, true, false, false),
@@ -73,7 +73,7 @@ public enum TableOption implements Option {
 
 	private Option delegate;
 
-	private TableOption(String name, Class<?> type, boolean requiresValue, boolean escapesValue, boolean quotesValue) {
+	TableOption(String name, Class<?> type, boolean requiresValue, boolean escapesValue, boolean quotesValue) {
 		this.delegate = new DefaultOption(name, type, requiresValue, escapesValue, quotesValue);
 	}
 
@@ -129,7 +129,7 @@ public enum TableOption implements Option {
 
 	/**
 	 * Known KeyCaching Options
-	 * 
+	 *
 	 * @author David Webb
 	 * @since 1.2.0
 	 *
@@ -140,7 +140,7 @@ public enum TableOption implements Option {
 
 		private String value;
 
-		private KeyCachingOption(String value) {
+		KeyCachingOption(String value) {
 			this.value = value;
 		}
 
@@ -156,7 +156,7 @@ public enum TableOption implements Option {
 
 	/**
 	 * Known caching options.
-	 * 
+	 *
 	 * @author Matthew T. Adams
 	 * @author David Webb
 	 * @since 1.2.0
@@ -169,7 +169,7 @@ public enum TableOption implements Option {
 
 		private Option delegate;
 
-		private CachingOption(String name, Class<?> type, boolean requiresValue, boolean escapesValue, boolean quotesValue) {
+		CachingOption(String name, Class<?> type, boolean requiresValue, boolean escapesValue, boolean quotesValue) {
 			this.delegate = new DefaultOption(name, type, requiresValue, escapesValue, quotesValue);
 		}
 
@@ -227,7 +227,7 @@ public enum TableOption implements Option {
 
 	/**
 	 * Known compaction options.
-	 * 
+	 *
 	 * @author Matthew T. Adams
 	 */
 	public enum CompactionOption implements Option {
@@ -270,8 +270,8 @@ public enum TableOption implements Option {
 
 		private Option delegate;
 
-		private CompactionOption(String name, Class<?> type, boolean requiresValue, boolean escapesValue,
-				boolean quotesValue) {
+		CompactionOption(String name, Class<?> type, boolean requiresValue, boolean escapesValue,
+						 boolean quotesValue) {
 			this.delegate = new DefaultOption(name, type, requiresValue, escapesValue, quotesValue);
 		}
 
@@ -328,7 +328,7 @@ public enum TableOption implements Option {
 
 	/**
 	 * Known compression options.
-	 * 
+	 *
 	 * @author Matthew T. Adams
 	 */
 	public enum CompressionOption implements Option {
@@ -347,8 +347,8 @@ public enum TableOption implements Option {
 
 		private Option delegate;
 
-		private CompressionOption(String name, Class<?> type, boolean requiresValue, boolean escapesValue,
-				boolean quotesValue) {
+		CompressionOption(String name, Class<?> type, boolean requiresValue, boolean escapesValue,
+						  boolean quotesValue) {
 			this.delegate = new DefaultOption(name, type, requiresValue, escapesValue, quotesValue);
 		}
 

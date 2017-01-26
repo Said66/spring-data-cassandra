@@ -252,10 +252,10 @@ public class BasicCassandraMappingContext
 		CassandraPersistentEntity<T> entity;
 
 		if (userDefinedType != null) {
-			entity = new CassandraUserTypePersistentEntity<T>(typeInformation, this, verifier, userTypeResolver);
+			entity = new CassandraUserTypePersistentEntity<>(typeInformation, this, verifier, userTypeResolver);
 			userDefinedTypes.add(entity);
 		} else {
-			entity = new BasicCassandraPersistentEntity<T>(typeInformation, this, verifier);
+			entity = new BasicCassandraPersistentEntity<>(typeInformation, this, verifier);
 		}
 
 		if (context != null) {
@@ -331,14 +331,7 @@ public class BasicCassandraMappingContext
 	}
 
 	private boolean hasMappedUserType(CqlIdentifier identifier) {
-
-		for (CassandraPersistentEntity<?> userDefinedType : userDefinedTypes) {
-			if (userDefinedType.getTableName().equals(identifier)) {
-				return true;
-			}
-		}
-
-		return false;
+		return userDefinedTypes.stream().map(CassandraPersistentEntity::getTableName).anyMatch(identifier::equals);
 	}
 
 	@Override

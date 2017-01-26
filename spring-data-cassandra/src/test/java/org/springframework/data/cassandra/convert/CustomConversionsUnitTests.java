@@ -269,7 +269,7 @@ public class CustomConversionsUnitTests {
 
 		@Override
 		public <T extends Format> Converter<String, T> getConverter(Class<T> targetType) {
-			return new StringToFormat<T>(targetType);
+			return new StringToFormat<>(targetType);
 		}
 
 		private static final class StringToFormat<T extends Format> implements Converter<String, T> {

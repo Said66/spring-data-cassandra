@@ -41,7 +41,7 @@ import com.datastax.driver.core.UserType;
 
 /**
  * Unit tests for {@link CassandraPersistentEntitySchemaDropper}.
- * 
+ *
  * @author Mark Paluch.
  */
 @SuppressWarnings("unchecked")
@@ -80,7 +80,7 @@ public class CassandraPersistentEntitySchemaDropperUnitTests {
 	@Test // DATACASS-355
 	public void shouldDropTypes() throws Exception {
 
-		context.setInitialEntitySet(new HashSet<Class<?>>(Arrays.asList(MoonType.class, UniverseType.class)));
+		context.setInitialEntitySet(new HashSet<>(Arrays.asList(MoonType.class, UniverseType.class)));
 		context.afterPropertiesSet();
 
 		when(metadata.getUserTypes()).thenReturn(Arrays.asList(universetype, moontype, planettype));
@@ -100,7 +100,7 @@ public class CassandraPersistentEntitySchemaDropperUnitTests {
 	@Test // DATACASS-355
 	public void dropUserTypesShouldRetainUnusedTypes() {
 
-		context.setInitialEntitySet(new HashSet<Class<?>>(Arrays.asList(MoonType.class, UniverseType.class)));
+		context.setInitialEntitySet(new HashSet<>(Arrays.asList(MoonType.class, UniverseType.class)));
 		context.afterPropertiesSet();
 
 		when(metadata.getUserTypes()).thenReturn(Arrays.asList(universetype, moontype, planettype));

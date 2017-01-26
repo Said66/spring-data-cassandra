@@ -65,7 +65,7 @@ public class SimpleCassandraRepository<T, ID extends Serializable> implements Ty
 	@Override
 	public <S extends T> List<S> save(Iterable<S> entities) {
 
-		List<S> saved = new ArrayList<S>();
+		List<S> saved = new ArrayList<>();
 		for (S entity : entities) {
 			operations.insert(entity).ifPresent(saved::add);
 		}

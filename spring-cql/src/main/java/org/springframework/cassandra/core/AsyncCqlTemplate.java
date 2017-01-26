@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 the original author or authors.
+ * Copyright 2016-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -280,7 +280,7 @@ public class AsyncCqlTemplate extends CassandraAccessor implements AsyncCqlOpera
 			return new ExceptionTranslatingListenableFutureAdapter<>(
 					new MappingListenableFutureAdapter<>(new GuavaListenableFutureAdapter<>(
 							results, ex -> translateExceptionIfPossible("Query", statement.toString(), ex)),
-						resultSetExtractor::extractData),
+							resultSetExtractor::extractData),
 					getExceptionTranslator());
 		} catch (DriverException e) {
 			throw translateException("Query", statement.toString(), e);
@@ -427,13 +427,13 @@ public class AsyncCqlTemplate extends CassandraAccessor implements AsyncCqlOpera
 
 			return new ExceptionTranslatingListenableFutureAdapter<>(
 					new MappingListenableFutureAdapter<>(preparedStatementCreator.createPreparedStatement(getSession()),
-						preparedStatement -> {
-							try {
-								return action.doInPreparedStatement(applyStatementSettings(preparedStatement));
-							} catch (DriverException e) {
-								throw translateException("PreparedStatementCallback", preparedStatement.toString(), e);
-							}
-						}), getExceptionTranslator());
+							preparedStatement -> {
+								try {
+									return action.doInPreparedStatement(applyStatementSettings(preparedStatement));
+								} catch (DriverException e) {
+									throw translateException("PreparedStatementCallback", preparedStatement.toString(), e);
+								}
+							}), getExceptionTranslator());
 
 		} catch (DriverException e) {
 			throw translateException("PreparedStatementCallback", toCql(preparedStatementCreator), e);
@@ -558,7 +558,7 @@ public class AsyncCqlTemplate extends CassandraAccessor implements AsyncCqlOpera
 			newResultSetExtractor(rowCallbackHandler));
 
 		return new ExceptionTranslatingListenableFutureAdapter<>(new MappingListenableFutureAdapter<>(
-			results, o -> null), getExceptionTranslator());
+				results, o -> null), getExceptionTranslator());
 	}
 
 	/*
@@ -595,7 +595,7 @@ public class AsyncCqlTemplate extends CassandraAccessor implements AsyncCqlOpera
 			newResultSetExtractor(rowCallbackHandler));
 
 		return new ExceptionTranslatingListenableFutureAdapter<>(new MappingListenableFutureAdapter<>(
-			results, o -> null), getExceptionTranslator());
+				results, o -> null), getExceptionTranslator());
 	}
 
 	/*
@@ -633,7 +633,7 @@ public class AsyncCqlTemplate extends CassandraAccessor implements AsyncCqlOpera
 			newResultSetExtractor(rowCallbackHandler));
 
 		return new ExceptionTranslatingListenableFutureAdapter<>(new MappingListenableFutureAdapter<>(
-			results, o -> null), getExceptionTranslator());
+				results, o -> null), getExceptionTranslator());
 	}
 
 	/*
@@ -704,7 +704,7 @@ public class AsyncCqlTemplate extends CassandraAccessor implements AsyncCqlOpera
 			newPreparedStatementBinder(args), newResultSetExtractor(rowMapper, 1));
 
 		return new ExceptionTranslatingListenableFutureAdapter<>(new MappingListenableFutureAdapter<>(
-			results, DataAccessUtils::requiredSingleResult), getExceptionTranslator());
+				results, DataAccessUtils::requiredSingleResult), getExceptionTranslator());
 	}
 
 	/*
@@ -783,7 +783,7 @@ public class AsyncCqlTemplate extends CassandraAccessor implements AsyncCqlOpera
 		public ListenableFuture<PreparedStatement> createPreparedStatement(Session session) throws DriverException {
 
 			return new GuavaListenableFutureAdapter<>(session.prepareAsync(getCql()),
-				this.persistenceExceptionTranslator);
+					this.persistenceExceptionTranslator);
 		}
 	}
 

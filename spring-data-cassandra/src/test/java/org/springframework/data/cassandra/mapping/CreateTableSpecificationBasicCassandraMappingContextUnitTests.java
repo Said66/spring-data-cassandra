@@ -60,7 +60,7 @@ public class CreateTableSpecificationBasicCassandraMappingContextUnitTests {
 	@Before
 	public void setUp() throws Exception {
 
-		List<Converter<?, ?>> converters = new ArrayList<Converter<?, ?>>();
+		List<Converter<?, ?>> converters = new ArrayList<>();
 		converters.add(new PersonReadConverter());
 		converters.add(new PersonWriteConverter());
 

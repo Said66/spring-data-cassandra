@@ -51,7 +51,7 @@ import com.google.common.util.concurrent.SettableFuture;
 
 /**
  * Unit tests for {@link AsyncCqlTemplate}.
- * 
+ *
  * @author Mark Paluch
  */
 @RunWith(MockitoJUnitRunner.class)
@@ -578,7 +578,7 @@ public class AsyncCqlTemplateUnitTests {
 		when(session.executeAsync(boundStatement)).thenReturn(new TestResultSetFuture(resultSet));
 		when(resultSet.iterator()).thenReturn(Collections.singleton(row).iterator());
 
-		ListenableFuture<ResultSet> future = template.query(session -> new AsyncResult<>(preparedStatement), ps -> {
+		ListenableFuture<ResultSet> future = template.query(session -> new AsyncResult<PreparedStatement>(preparedStatement), ps -> {
 			ps.bind("a", "b");
 			return boundStatement;
 		}, rs -> rs);
@@ -612,7 +612,7 @@ public class AsyncCqlTemplateUnitTests {
 
 		when(preparedStatement.bind()).thenReturn(boundStatement);
 
-		ListenableFuture<ResultSet> future = template.query(session -> new AsyncResult<>(preparedStatement), ps -> {
+		ListenableFuture<ResultSet> future = template.query(session -> new AsyncResult<PreparedStatement>(preparedStatement), ps -> {
 			throw new NoHostAvailableException(Collections.emptyMap());
 		}, rs -> rs);
 
@@ -634,7 +634,7 @@ public class AsyncCqlTemplateUnitTests {
 
 		when(session.executeAsync(boundStatement)).thenReturn(resultSetFuture);
 
-		ListenableFuture<ResultSet> future = template.query(session -> new AsyncResult<>(preparedStatement), ps -> {
+		ListenableFuture<ResultSet> future = template.query(session -> new AsyncResult<PreparedStatement>(preparedStatement), ps -> {
 			ps.bind("a", "b");
 			return boundStatement;
 		}, rs -> rs);

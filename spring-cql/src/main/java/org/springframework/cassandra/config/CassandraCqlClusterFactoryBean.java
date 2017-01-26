@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2016 the original author or authors.
+ * Copyright 2013-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -97,12 +97,12 @@ public class CassandraCqlClusterFactoryBean
 	private Host.StateListener hostStateListener;
 	private LatencyTracker latencyTracker;
 
-	private List<CreateKeyspaceSpecification> keyspaceCreations = new ArrayList<CreateKeyspaceSpecification>();
-	private List<DropKeyspaceSpecification> keyspaceDrops = new ArrayList<DropKeyspaceSpecification>();
-	private Set<KeyspaceActionSpecification<?>> keyspaceSpecifications = new HashSet<KeyspaceActionSpecification<?>>();
+	private List<CreateKeyspaceSpecification> keyspaceCreations = new ArrayList<>();
+	private List<DropKeyspaceSpecification> keyspaceDrops = new ArrayList<>();
+	private Set<KeyspaceActionSpecification<?>> keyspaceSpecifications = new HashSet<>();
 
-	private List<String> startupScripts = new ArrayList<String>();
-	private List<String> shutdownScripts = new ArrayList<String>();
+	private List<String> startupScripts = new ArrayList<>();
+	private List<String> shutdownScripts = new ArrayList<>();
 
 	private LoadBalancingPolicy loadBalancingPolicy;
 	private NettyOptions nettyOptions;

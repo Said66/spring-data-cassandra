@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2016 the original author or authors
+ * Copyright 2013-2017 the original author or authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -75,27 +75,26 @@ public class CassandraMappingContextParser extends AbstractSingleBeanDefinitionP
 
 		if (StringUtils.hasText(packages)) {
 			try {
-				Set<Class<?>> entityClasses = CassandraEntityClassScanner.scan(
-					StringUtils.commaDelimitedListToStringArray(packages));
+				Set<Class<?>> entityClasses = CassandraEntityClassScanner
+						.scan(StringUtils.commaDelimitedListToStringArray(packages));
 
 				builder.addPropertyValue("initialEntitySet", entityClasses);
 			} catch (Exception x) {
 				throw new IllegalArgumentException(
-						String.format("encountered exception while scanning for entity classes in package(s) [%s]",
-							packages), x);
+						String.format("encountered exception while scanning for entity classes in package(s) [%s]", packages), x);
 			}
 		}
 
-		Set<EntityMapping> mappings = new HashSet<EntityMapping>();
+		Set<EntityMapping> mappings = new HashSet<>();
 
-		for (Element entity : DomUtils.getChildElementsByTagName(element, "entity")) {
+		DomUtils.getChildElementsByTagName(element, "entity").forEach(entity -> {
 
 			EntityMapping entityMapping = parseEntity(entity);
 
 			if (entityMapping != null) {
 				mappings.add(entityMapping);
 			}
-		}
+		});
 
 		List<Element> userTypeResolvers = DomUtils.getChildElementsByTagName(element, "user-type-resolver");
 		String userTypeResolverRef = element.getAttribute("user-type-resolver-ref");
@@ -105,7 +104,7 @@ public class CassandraMappingContextParser extends AbstractSingleBeanDefinitionP
 			builder.addPropertyReference("userTypeResolver", userTypeResolverRef);
 		}
 
-		if (!userTypeResolvers.isEmpty()){
+		if (!userTypeResolvers.isEmpty()) {
 			BeanDefinition userTypeResolver = parseUserTypeResolver(userTypeResolvers.get(0));
 			builder.addPropertyValue("userTypeResolver", userTypeResolver);
 		}
@@ -160,7 +159,7 @@ public class CassandraMappingContextParser extends AbstractSingleBeanDefinitionP
 
 	protected Map<String, PropertyMapping> parsePropertyMappings(Element entity) {
 
-		Map<String, PropertyMapping> propertyMappings = new HashMap<String, PropertyMapping>();
+		Map<String, PropertyMapping> propertyMappings = new HashMap<>();
 
 		for (Element property : DomUtils.getChildElementsByTagName(entity, "property")) {
 

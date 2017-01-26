@@ -61,9 +61,9 @@ public class CassandraRule extends ExternalResource {
 	private final String configurationFileName;
 	private final long startUpTimeout;
 
-	private List<SessionCallback<Void>> before = new ArrayList<SessionCallback<Void>>();
-	private Map<SessionCallback<?>, InvocationMode> invocationModeMap = new HashMap<SessionCallback<?>, InvocationMode>();
-	private List<SessionCallback<Void>> after = new ArrayList<SessionCallback<Void>>();
+	private List<SessionCallback<Void>> before = new ArrayList<>();
+	private Map<SessionCallback<?>, InvocationMode> invocationModeMap = new HashMap<>();
+	private List<SessionCallback<Void>> after = new ArrayList<>();
 
 	private Session session;
 	private Cluster cluster;
@@ -376,9 +376,7 @@ public class CassandraRule extends ExternalResource {
 			session.execute(String.format("USE %s;", cqlDataSet.getKeyspaceName()));
 		}
 
-		for (String statement : cqlDataSet.getCqlStatements()) {
-			session.execute(statement);
-		}
+		cqlDataSet.getCqlStatements().forEach(session::execute);
 	}
 
 	/**

@@ -52,7 +52,7 @@ public class MapBuilder<K, V> implements Map<K, V> {
 
 		Assert.notNull(source, "Source map must not be null");
 
-		this.map = new LinkedHashMap<K, V>(source);
+		this.map = new LinkedHashMap<>(source);
 	}
 
 	/**
@@ -73,7 +73,7 @@ public class MapBuilder<K, V> implements Map<K, V> {
 	 * Factory method to construct a new builder with a shallow copy of the given map. Convenient if imported statically.
 	 */
 	public static <K, V> MapBuilder<K, V> map(Map<K, V> source) {
-		return new MapBuilder<K, V>(source);
+		return new MapBuilder<>(source);
 	}
 
 	/**
@@ -92,7 +92,7 @@ public class MapBuilder<K, V> implements Map<K, V> {
 	 * @return A new Map<K, V> with this builder's map's current content.
 	 */
 	public Map<K, V> build() {
-		return new LinkedHashMap<K, V>(map);
+		return new LinkedHashMap<>(map);
 	}
 
 	/* (non-Javadoc)
