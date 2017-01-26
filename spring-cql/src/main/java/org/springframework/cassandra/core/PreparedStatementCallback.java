@@ -34,6 +34,8 @@ import org.springframework.dao.DataAccessException;
  *
  * @author David Webb
  * @author Mark Paluch
+ * @see AsyncCqlTemplate#execute(String, PreparedStatementCallback)
+ * @see AsyncCqlTemplate#execute(PreparedStatementCreator, PreparedStatementCallback)
  * @see CqlTemplate#execute(String, PreparedStatementCallback)
  * @see CqlTemplate#execute(PreparedStatementCreator, PreparedStatementCallback)
  */
@@ -51,9 +53,10 @@ public interface PreparedStatementCallback<T> {
 	 * @return a result object publisher.
 	 * @throws DriverException if thrown by a session method, to be auto-converted to a DataAccessException.
 	 * @throws DataAccessException in case of custom exceptions.
+	 * @see AsyncCqlTemplate#queryForObject(String, Class, Object...)
+	 * @see AsyncCqlTemplate#queryForList(String, Class, Object...)
 	 * @see CqlTemplate#queryForObject(String, Class, Object...)
 	 * @see CqlTemplate#queryForList(String, Object...)
 	 */
 	T doInPreparedStatement(PreparedStatement preparedStatement) throws DriverException, DataAccessException;
-
 }

@@ -79,7 +79,7 @@ import org.springframework.util.concurrent.SettableListenableFuture;
 public class AsyncCqlTemplate extends CassandraAccessor implements AsyncCqlOperations {
 
 	/**
-	 * Constructs a new, uninitialized {@link AsyncCqlTemplate}.
+	 * Create a new, uninitialized {@link AsyncCqlTemplate}.
 	 *
 	 * Note: The {@link Session} has to be set before using the instance.
 	 *
@@ -88,7 +88,7 @@ public class AsyncCqlTemplate extends CassandraAccessor implements AsyncCqlOpera
 	public AsyncCqlTemplate() {}
 
 	/**
-	 * Constructs a new {@link AsyncCqlTemplate} with the given {@link Session}.
+	 * Create a new {@link AsyncCqlTemplate} with the given {@link Session}.
 	 *
 	 * @param session the active Cassandra {@link Session}.
 	 * @throws IllegalStateException if {@link Session} is {@literal null}.
